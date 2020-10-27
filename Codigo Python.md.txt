@@ -1,3 +1,5 @@
-Código Python para el tranajo de riesgo
+Código Python para el trabajo de riesgo
 
 Lo he logrado.
+
+Este es un saludo del más acá.
