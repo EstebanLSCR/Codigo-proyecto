@@ -1,0 +1,196 @@
+---
+title: "P.T.R"
+author: "Marco Mejia Elizondo"
+date: "1/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(fitdistrplus)
+library(actuar)
+library(kutils)
+library(tidyr)
+library(xtable)
+library(dplyr)
+library(vioplot)
+library(ggplot2)
+library(readxl)
+library(rriskDistributions)
+library(lubridate)
+
+defraudaciones <- read_excel("Defraudaciones enero-junio 2020.xlsx")
+```
+
+```{r}
+
+recl1 <- log(defraudaciones$MontoHistorico)
+recl2 <- defraudaciones$MontoHistorico
+
+res1 <- fit.cont(data2fit=recl1)
+
+
+# fitdist(log((defraudaciones$MontoHistorico), "pareto")
+# fitdist(defraudaciones$MontoHistorico, "pareto")
+# fitdist(((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico), "pareto")
+# hist(recl1)
+# hist(recl2)
+
+hist((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico)
+hist(log((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico))
+
+
+# 75%
+x1 <- (defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico
+x2 <- log((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico)
+
+fit.cont(data2fit=x1)
+fit.cont(data2fit=x2)
+
+# 99%
+y1 <- (defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico
+y2 <- log((defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico)
+
+fit.cont(data2fit=y1)
+fit.cont(data2fit=y2)
+```
+
+```{r}
+quantile(defraudaciones$MontoHistorico,0.99)
+```
+
+
+```{r}
+hist(((defraudaciones %>% filter(MontoHistorico<7000000))$MontoHistorico))
+hist(log((defraudaciones %>% filter(MontoHistorico<7000000))$MontoHistorico))
+```
+
+```{r}
+defraudaciones <- defraudaciones %>% mutate(YearD = year(defraudaciones$FechaDescubrimiento),
+                                            YearO = year(defraudaciones$FechaOcurrencia),
+                                            YearR = year(defraudaciones$FechaRegistro))
+
+plot(defraudaciones$YearD)
+plot(defraudaciones$YearO)
+plot(defraudaciones$YearR)
+
+defraudaciones
+
+
+# "O" ocurrencia
+# "D" descubrimiento
+F.Frecuencias <- function(datos, tipo){
+  if(tipo == "D"){
+      datost <- datos %>% mutate(Mes = month(datos$FechaDescubrimiento))
+    }else{
+      datost <- datos %>% mutate(Mes = month(datos$FechaOcurrencia))
+    }
+  
+  frec <- c()
+  
+  for (i in 1:12) {
+    frec[i] <- count(datost %>% filter(Mes == i))[[1]]
+  }
+  return( frec )
+}
+
+frecuencias.O <- F.Frecuencias(defraudaciones, "O")
+frecuencias.D <- F.Frecuencias(defraudaciones, "D")
+
+
+chisq.test(frecuencias.D)
+chisq.test(frecuencias.O)
+```
+
+```{r}
+(defraudaciones %>% filter(MontoHistorico>3000000))
+```
+
+```{r}
+frecuencias.O
+frecuencias.D
+```
+
+
+```{r}
+
+x1 <- defraudaciones %>% filter(MesD==1)
+ggplot(x1, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x1$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x1$MontoHistorico), 0.75)[[1]], color = "red")
+
+
+x2 <- defraudaciones %>% filter(MesD==2)
+ggplot(x2, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x2$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x2$MontoHistorico), 0.75)[[1]], color = "red")
+
+x3 <- defraudaciones %>% filter(MesD==3)
+ggplot(x3, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x3$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x3$MontoHistorico), 0.75)[[1]], color = "red")
+
+x4 <- defraudaciones %>% filter(MesD==4)
+ggplot(x4, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x4$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x4$MontoHistorico), 0.75)[[1]], color = "red")
+
+x5 <- defraudaciones %>% filter(MesD==5)
+ggplot(x5, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x5$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x5$MontoHistorico), 0.75)[[1]], color = "red")
+
+x6 <- defraudaciones %>% filter(MesD==6)
+ggplot(x6, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x6$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x6$MontoHistorico), 0.75)[[1]], color = "red")
+
+x7 <- defraudaciones %>% filter(MesD==7)
+ggplot(x7, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x7$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x7$MontoHistorico), 0.75)[[1]], color = "red")
+
+x8 <- defraudaciones %>% filter(MesD==8)
+ggplot(x8, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x8$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x8$MontoHistorico), 0.75)[[1]], color = "red")
+
+x9 <- defraudaciones %>% filter(MesD==9)
+ggplot(x9, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x9$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x9$MontoHistorico), 0.75)[[1]], color = "red")
+
+x10 <- defraudaciones %>% filter(MesD==10)
+ggplot(x10, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x10$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x10$MontoHistorico), 0.75)[[1]], color = "red")
+
+x11 <- defraudaciones %>% filter(MesD==11)
+ggplot(x11, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x11$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x11$MontoHistorico), 0.75)[[1]], color = "red")
+
+x12 <- defraudaciones %>% filter(MesD==12)
+ggplot(x12, aes(x=log(MontoHistorico))) +
+  geom_histogram() +
+  geom_vline(xintercept=quantile(log(x12$MontoHistorico), 0.25)[[1]], color="red") +
+  geom_vline(xintercept=quantile(log(x12$MontoHistorico), 0.75)[[1]], color = "red")
+
+
+
+```
+
