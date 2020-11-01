@@ -10,8 +10,6 @@ Created on Tue Oct 27 06:50:33 2020
 
 # Código proyecto de riesgo
 
-
-
 #%%
 import pandas as pd
 import numpy as np
@@ -22,6 +20,7 @@ import seaborn as sns
 import statsmodels.api as sm
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
+
 
 
 #%%
@@ -64,7 +63,3 @@ f.summary()
 
 
 #%%
-
-
-
-
