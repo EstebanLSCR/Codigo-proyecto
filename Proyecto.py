@@ -146,3 +146,67 @@ plt.ylabel('Conteo')
 
 
 #%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# alpha = nivel de significancia, 0.95, 0.99...
+# parametros[0] = "normal", "pareto"...
+# parametros[1] = parametro 1
+# parametros[2] = parametros 2, ya viene como scale
+# ...
+
+parametros = ("normal", 1, 2)
+alpha = 0.95
+
+def VaR_alpha(alpha, parametros):
+    
+    if(parametros[0] == "normal"):
+        from scipy.stats import norm
+        VaR = norm.ppf(alpha,parametros[1],parametros[2])
+    
+    elif(parametros[0] == "gamma"):
+        from scipy.stats import gamma
+        VaR = gamma.ppf(alpha,parametros[1],scale=parametros[2])
+    
+    elif(parametros[0] == "pareto"):
+        from scipy.stats import pareto
+        VaR = pareto.ppf(q=alpha,b=parametros[1],scale=parametros[2])
+    
+    
+    
+    
+    return VaR
+    
+
+
+
