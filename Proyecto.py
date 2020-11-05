@@ -68,34 +68,6 @@ f.summary()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # alpha = nivel de significancia, 0.95, 0.99...
 # parametros[0] = "normal", "pareto"...
 # parametros[1] = parametro 1
@@ -107,7 +79,11 @@ alpha = 0.95
 
 def VaR_alpha(alpha, parametros):
     
-    if(parametros[0] == "normal"):
+    if(parametros[0] == "gennormal"):
+        from scipy.stats import gennorm
+        VaR = gennorm.ppf(alpha,parametros[1],parametros[2])
+        
+    elif(parametros[0] == "normal"):
         from scipy.stats import norm
         VaR = norm.ppf(alpha,parametros[1],parametros[2])
     
@@ -119,9 +95,14 @@ def VaR_alpha(alpha, parametros):
         from scipy.stats import pareto
         VaR = pareto.ppf(q=alpha,b=parametros[1],scale=parametros[2])
     
+    elif(parametros[0] == "weibull"):
+        from scipy.stats import weibull
+        VaR = weibull.ppf(q=alpha,b=parametros[1],scale=parametros[2])
     
-    
-    
+    else: #(parametros[0] == "lognorm"):
+        from scipy.stats import lognorm
+        VaR = lognorm.ppf(q=alpha,b=parametros[1],scale=parametros[2])
+        
     return VaR
     
 
