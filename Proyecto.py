@@ -18,12 +18,15 @@ import matplotlib.pyplot as plt
 from fitter import Fitter
 import seaborn as sns
 import statsmodels.api as sm
+<<<<<<< Updated upstream
 from datetime import datetime
 from datetime import timedelta
 from dfply import *
 from bioinfokit.analys import stat
 from scipy.stats import chisquare
 
+=======
+>>>>>>> Stashed changes
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 
@@ -46,7 +49,6 @@ f.fit()
 
 
 f.summary()
-
 #fit = pareto.fit(datos.MontoHistorico)
 #print(fit)
 
@@ -67,6 +69,7 @@ f.summary()
 
 
 
+<<<<<<< Updated upstream
 #%%
     #datos['mesO']=0
     #datos['mesD']=0
@@ -159,5 +162,10 @@ def VaR_alpha(alpha, parametros):
     return VaR
     
 
+=======
+#%%Frecuencias
+for i in 1:len(datos.MontoHistorico):
+        
+>>>>>>> Stashed changes
 
 
