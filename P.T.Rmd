@@ -69,13 +69,13 @@ hist(log((defraudaciones %>% filter(MontoHistorico<7000000))$MontoHistorico))
 ```
 
 ```{r}
-defraudaciones <- defraudaciones %>% mutate(YearD = year(defraudaciones$FechaDescubrimiento),
-                                            YearO = year(defraudaciones$FechaOcurrencia),
-                                            YearR = year(defraudaciones$FechaRegistro))
+defraudaciones <- defraudaciones %>% mutate(MesD = month(defraudaciones$FechaDescubrimiento),
+                                            MesO = month(defraudaciones$FechaOcurrencia),
+                                            MesR = month(defraudaciones$FechaRegistro))
 
-plot(defraudaciones$YearD)
-plot(defraudaciones$YearO)
-plot(defraudaciones$YearR)
+plot(defraudaciones$MesD)
+plot(defraudaciones$MesO)
+plot(defraudaciones$MesR)
 
 defraudaciones
 
