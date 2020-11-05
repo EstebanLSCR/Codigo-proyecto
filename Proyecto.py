@@ -18,6 +18,11 @@ import matplotlib.pyplot as plt
 from fitter import Fitter
 import seaborn as sns
 import statsmodels.api as sm
+from datetime import datetime
+from datetime import timedelta
+from dfply import *
+from bioinfokit.analys import stat
+from scipy.stats import chisquare
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
@@ -63,23 +68,52 @@ f.summary()
 
 
 #%%
+    #datos['mesO']=0
+    #datos['mesD']=0
+for i in range(0,len(datos.MontoHistorico)):
+    datos.mesO[i]=(datos.FechaOcurrencia[i]).month
+    datos.mesD[i]=(datos.FechaDescubrimiento[i]).month
+    
+#datos 
+#tipo: "O", "D"
+#...
+
+def F_frecuencias(datos):
+    #frec=[1,2,3,4,5,6,7,8,9,10,11,12]
+    frecO=datos["MontoHistorico"]
+    frecO=frecO[1:12]
+    #frecD=[1,2,3,4,5,6,7,8,9,10,11,12]
+    
+    
+    for i in range(1,13): 
+            frecO[i] = len((datos>>
+                               mask(X.mesO==i)).mesO)
+            
+            #frecD[i] = len((datos>>
+                            #mask(X.mesD==i)).mesD)
+            
+   # if(tipo=="O"):
+   #            frec = frecO
+                
+   # elif(tipo=="D"):
+   #             frec = frecd
+            
+                
+    return frecO
 
 
 
+#res = stat()
 
+#res.chisq(df=datos)
 
+#Prueba chi cuadrado
+#vec=(F_frecuencias(datos,"O"))
+#chisquare(vec)
 
-
-
-
-
-
-
-
-
-
-
-
+#df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
+#df["BigFrec"]=df["frecuenciaO"]>30
+#observados=pd.crosstab(index=df['BigFrec'],columns=df['MontoHistorico'],margins=True)
 
 
 

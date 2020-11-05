@@ -91,9 +91,9 @@ F.Frecuencias <- function(datos, tipo){
   
   frec <- c()
   
-  for (i in 1:12) {
-    frec[i] <- count(datost %>% filter(Mes == i))[[1]]
-  }
+    for (i in 1:12) {
+      frec[i] <- count(datost %>% filter(Mes == i))[[1]]
+    }
   return( frec )
 }
 

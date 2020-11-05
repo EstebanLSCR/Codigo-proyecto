@@ -7,3 +7,5 @@ Este es un saludo del más acá.
 1, 2, 3, quest stop.
 
 Si les sale el código hasta datos = read_excel(……. ?
+
+Error!
