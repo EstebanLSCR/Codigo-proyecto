@@ -87,7 +87,7 @@ plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
     #datos['mesD']=0
 for i in range(0,len(datos.MontoHistorico)):
     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
-    datos.mesD[i]=(datos.FechaDescubrimiento[i]).month
+    datos.mesR[i]=(datos.FechaRegistro[i]).month
     
 #datos 
 #tipo: "O", "D"
