@@ -19,20 +19,12 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from fitter import Fitter
 import statsmodels.api as sm
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 from datetime import datetime
 from datetime import timedelta
 from dfply import *
 from bioinfokit.analys import stat
 from scipy.stats import chisquare
-
-=======
->>>>>>> Stashed changes
-=======
 import datetime
-
->>>>>>> e5b8bc537af33e877029b4eb5ef289ab7b3880a1
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #%%
@@ -49,7 +41,6 @@ plt.ylabel('Conteo')
 
 ## Ajustando para valores con la transformación logarítmica
 
-<<<<<<< HEAD
 f.summary()
 #fit = pareto.fit(datos.MontoHistorico)
 #print(fit)
@@ -58,8 +49,6 @@ f.summary()
 
 
 #%%
-=======
->>>>>>> e5b8bc537af33e877029b4eb5ef289ab7b3880a1
 logeados = np.log(datos.MontoHistorico)
 
 
@@ -77,9 +66,6 @@ plt.ylabel('Densidad')
 
 # Para salvar imagen
 ## plt.savefig('Prueba.svg', format='svg', dpi=1200)
-
-
-<<<<<<< Updated upstream
 #%% Frecuencias
     #datos['mesO']=0
     #datos['mesD']=0
@@ -175,8 +161,6 @@ fig.subplots_adjust(top=0.86)
 plt.show()
 
 #%%
-
-=======
 fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
                                "%Y-%m-%d %H:%M:%S") ])
 for i in range(0, len(datos.FechaDescubrimiento)):
@@ -185,9 +169,7 @@ for i in range(0, len(datos.FechaDescubrimiento)):
     fechas = np.append(fechas, temp)
 
 meses = [x.month for x in fechas]
->>>>>>> e5b8bc537af33e877029b4eb5ef289ab7b3880a1
 
-<<<<<<< HEAD
 #df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
 #df["BigFrec"]=df["frecuenciaO"]>30
 #observados=pd.crosstab(index=df['BigFrec'],columns=df['MontoHistorico'],margins=True)
@@ -201,7 +183,6 @@ meses = [x.month for x in fechas]
 #chisquare(vec)
 
 
-=======
 #%%
 
 
@@ -210,22 +191,11 @@ plt.hist(meses, bins = 12)
 plt.title("Histograma de meses de descubrimiento")
 plt.xlabel('Mes')
 plt.ylabel('Conteo') 
->>>>>>> e5b8bc537af33e877029b4eb5ef289ab7b3880a1
 
 
 
 
-
-
-
-<<<<<<< HEAD
-=======
 #%%
->>>>>>> e5b8bc537af33e877029b4eb5ef289ab7b3880a1
-
-
-
-
 
 # alpha = nivel de significancia, 0.95, 0.99...
 # parametros[0] = "normal", "pareto"...
@@ -264,11 +234,5 @@ def VaR_alpha(alpha, parametros):
         
     return VaR
     
-
-=======
-#%%Frecuencias
-for i in 1:len(datos.MontoHistorico):
-        
->>>>>>> Stashed changes
 
 
