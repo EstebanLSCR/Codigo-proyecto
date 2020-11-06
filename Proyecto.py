@@ -25,11 +25,8 @@ from dfply import *
 from bioinfokit.analys import stat
 from scipy.stats import chisquare
 import datetime
-<<<<<<< HEAD
-=======
 import seaborn as sns
 
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #%%
@@ -44,10 +41,9 @@ plt.ylabel('Conteo')
 
 #%%
 
-<<<<<<< HEAD
 ## Ajustando para valores con la transformación logarítmica
 
-f.summary()
+#f.summary()
 #fit = pareto.fit(datos.MontoHistorico)
 #print(fit)
 
@@ -55,14 +51,10 @@ f.summary()
 
 
 #%%
-=======
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
 logeados = np.log(datos.MontoHistorico)
 
 
-f = Fitter(logeados,  
-           distributions= ['gamma', 'dweibull',
-                           'gennorm'])
+f = Fitter(logeados, distributions= ['gamma', 'dweibull', 'gennorm'])
 
 f.fit()
 f.summary()
@@ -79,20 +71,17 @@ plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
 plt.legend()
 
 
-
 plt.title("Ajuste de densidades para las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
 
-<<<<<<< HEAD
 
 # Para salvar imagen
 ## plt.savefig('Prueba.svg', format='svg', dpi=1200)
-=======
+
 plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
 #%% Frecuencias
     #datos['mesO']=0
     #datos['mesD']=0
@@ -273,10 +262,7 @@ fig.subplots_adjust(top=0.86)
 plt.show()
 
 #%%
-<<<<<<< HEAD
-=======
 
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
 fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
                                "%Y-%m-%d %H:%M:%S") ])
 for i in range(0, len(datos.FechaDescubrimiento)):
@@ -298,10 +284,7 @@ meses = [x.month for x in fechas]
 #vec=(F_frecuencias(datos,"O"))
 #chisquare(vec)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
 #%%
 
 #Corte para valor extremo
@@ -316,8 +299,7 @@ f2.fit()
 plt.title("Histograma de meses de descubrimiento")
 plt.xlabel('Mes')
 plt.ylabel('Conteo') 
-<<<<<<< HEAD
-=======
+
 
 parametros_pareto2 = stats.genpareto.fit(logeados2, loc = 15 )
 
@@ -333,7 +315,7 @@ parametros_gamma2 = f2.fitted_param['gamma']
 f2.summary()
 plt.plot(np.sort(logeados2), f_pareto, color = "purple", label = "genpareto")
 plt.legend()
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
+
 
 plt.title("Ajuste de densidades para la cola de las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
@@ -414,31 +396,27 @@ plt.show()
 mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
 
-fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), 
-                               "%Y-%m-%d %H:%M:%S") ])
+fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
 for i in range(0, len(datos.FechaRegistro)):
-    temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), 
-                               "%Y-%m-%d %H:%M:%S")
+    temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
 
-meses = [mes[x.month] for x in fechas]
-
-<<<<<<< HEAD
+meses = [mes[x.month-1] for x in fechas]
 #%%
-=======
+
 
 #%%
 
 sns.countplot(meses)
 plt.title("Histograma de meses de registro")
-plt.xlabel('Mes')
+plt.xlabel('Meses')
 plt.ylabel('Conteo') 
 
 plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
 
 
 #%%
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
+
 
 # alpha = nivel de significancia, 0.95, 0.99...
 # parametros[0] = "normal", "pareto"...
@@ -478,11 +456,69 @@ def VaR_alpha(alpha, parametros):
     return VaR
     
 
-<<<<<<< HEAD
 
-=======
-#%%Frecuencias
-for i in 1:len(datos.MontoHistorico):
-        
+#%% Pruebas KS
+
+stats.kstest(logeados, "genpareto", args=(parametros_pareto))
+stats.kstest(logeados, "gennorm", args=(parametros_normal))
+stats.kstest(logeados, "gamma", args=(parametros_gamma))
+stats.kstest(logeados, "dweibull", args=(parametros_weibull))
+
+len(logeados2)
     
->>>>>>> f7e4625b852ae4574e31d47c7becbff97eaa9d69
+stats.kstest(logeados2, "genpareto", args=(parametros_pareto2))
+stats.kstest(logeados2, "gennorm", args=(parametros_normal2))
+stats.kstest(logeados2, "gamma", args=(parametros_gamma2))
+stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
+
+
+len(meses)
+
+stats.kstest(meses, "poisson")
+np.mean(meses)
+
+
+febrero=0
+marzo=0
+abril=0
+mayo=0
+junio=0
+julio=0
+for i in range(0, len(meses)):
+    if(meses[i]=='febrero'):
+       febrero=febrero+1
+    
+    elif(meses[i]=='marzo'):
+       marzo=marzo+1
+
+    elif(meses[i]=='abril'):
+       abril=abril+1
+
+    elif(meses[i]=='mayo'):
+       mayo=mayo+1
+       
+    elif(meses[i]=='junio'):
+       junio=junio+1
+
+    elif(meses[i]=='julio'):
+       julio=julio+1
+
+
+
+meses2 = [febrero,marzo,abril,mayo,junio,julio]
+meses2
+
+np.mean(meses2)
+np.var(meses2)
+
+
+
+from scipy.stats import poisson
+
+poisson.fit(meses2, loc = 2 )
+
+
+stats.kstest(meses2,"poisson",args=(125.5))
+
+
+

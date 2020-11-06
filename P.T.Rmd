@@ -16,7 +16,7 @@ library(kutils)
 library(tidyr)
 library(xtable)
 library(dplyr)
-library(vioplot)
+#library(vioplot)
 library(ggplot2)
 library(readxl)
 library(rriskDistributions)
@@ -25,12 +25,67 @@ library(lubridate)
 defraudaciones <- read_excel("Defraudaciones enero-junio 2020.xlsx")
 ```
 
+
+```{r}
+fechas <- defraudaciones$FechaRegistro
+
+F.lambda.Diario <- function(fechas){
+  return( as.double( mean( fechas[-1] - fechas[-length(fechas)]) ) )
+}
+
+F.lambda.Semestral <- function(fechas){
+  return( as.double( mean( fechas[-1] - fechas[-length(fechas)])/(365/2) ) )
+}
+
+F.lambda.Diario(fechas)
+
+F.lambda.Semestral(fechas)
+
+
+meses <- month(defraudaciones$FechaRegistro)
+
+enero=0
+febrero=0
+marzo=0
+abril=0
+mayo=0
+junio=0
+for (i in 1:length(meses)){
+  if(meses[i]==1){
+       enero=enero+1
+       }
+    else if(meses[i]==2){
+       febrero=febrero+1
+       }
+    else if(meses[i]==3){
+       marzo=marzo+1
+       }
+
+    else if(meses[i]==4)
+       abril=abril+1
+
+    else if(meses[i]==5)
+       mayo=mayo+1
+       
+    else if(meses[i]==6){
+       junio=junio+1}
+
+}
+
+
+meses2 = c(enero,febrero,marzo,abril,mayo,junio)
+meses2
+
+```
+
+
+
 ```{r}
 
 recl1 <- log(defraudaciones$MontoHistorico)
 recl2 <- defraudaciones$MontoHistorico
 
-res1 <- fit.cont(data2fit=recl1)
+#res1 <- fit.cont(data2fit=recl1)
 
 
 # fitdist(log((defraudaciones$MontoHistorico), "pareto")
@@ -47,15 +102,15 @@ hist(log((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico))
 x1 <- (defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico
 x2 <- log((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico)
 
-fit.cont(data2fit=x1)
-fit.cont(data2fit=x2)
+# fit.cont(data2fit=x1)
+# fit.cont(data2fit=x2)
 
 # 99%
 y1 <- (defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico
 y2 <- log((defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico)
 
-fit.cont(data2fit=y1)
-fit.cont(data2fit=y2)
+# fit.cont(data2fit=y1)
+# fit.cont(data2fit=y2)
 ```
 
 ```{r}
@@ -83,10 +138,10 @@ defraudaciones
 # "O" ocurrencia
 # "D" descubrimiento
 F.Frecuencias <- function(datos, tipo){
-  if(tipo == "D"){
-      datost <- datos %>% mutate(Mes = month(datos$FechaDescubrimiento))
+  if(tipo == "R"){
+      datost <- datos %>% mutate(Mes = month(datos$FechaRegistro))
     }else{
-      datost <- datos %>% mutate(Mes = month(datos$FechaOcurrencia))
+      datost <- datos %>% mutate(Mes = month(datos$FechaDescubrimiento))
     }
   
   frec <- c()
@@ -97,21 +152,19 @@ F.Frecuencias <- function(datos, tipo){
   return( frec )
 }
 
-frecuencias.O <- F.Frecuencias(defraudaciones, "O")
-frecuencias.D <- F.Frecuencias(defraudaciones, "D")
+frecuencias.R <- F.Frecuencias(defraudaciones, "R")[1:6]
+# frecuencias.D <- F.Frecuencias(defraudaciones, "D")
 
 
-chisq.test(frecuencias.D)
-chisq.test(frecuencias.O)
+chisq.test(frecuencias.R)
+# chisq.test(frecuencias.O)
+
 ```
 
-```{r}
-(defraudaciones %>% filter(MontoHistorico>3000000))
-```
 
 ```{r}
-frecuencias.O
-frecuencias.D
+frecuencias.R
+# frecuencias.D
 ```
 
 
