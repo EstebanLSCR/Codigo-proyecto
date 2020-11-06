@@ -69,13 +69,13 @@ hist(log((defraudaciones %>% filter(MontoHistorico<7000000))$MontoHistorico))
 ```
 
 ```{r}
-defraudaciones <- defraudaciones %>% mutate(YearD = year(defraudaciones$FechaDescubrimiento),
-                                            YearO = year(defraudaciones$FechaOcurrencia),
-                                            YearR = year(defraudaciones$FechaRegistro))
+defraudaciones <- defraudaciones %>% mutate(MesD = month(defraudaciones$FechaDescubrimiento),
+                                            MesO = month(defraudaciones$FechaOcurrencia),
+                                            MesR = month(defraudaciones$FechaRegistro))
 
-plot(defraudaciones$YearD)
-plot(defraudaciones$YearO)
-plot(defraudaciones$YearR)
+plot(defraudaciones$MesD)
+plot(defraudaciones$MesO)
+plot(defraudaciones$MesR)
 
 defraudaciones
 
@@ -91,9 +91,9 @@ F.Frecuencias <- function(datos, tipo){
   
   frec <- c()
   
-  for (i in 1:12) {
-    frec[i] <- count(datost %>% filter(Mes == i))[[1]]
-  }
+    for (i in 1:12) {
+      frec[i] <- count(datost %>% filter(Mes == i))[[1]]
+    }
   return( frec )
 }
 
