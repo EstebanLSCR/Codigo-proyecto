@@ -548,11 +548,7 @@ m3 = Fitter(meses2)
 m3.fit()
 m3.summary()
 
-
-chisquare([16, 18, 16, 14, 12, 12], [np.mean([16, 18, 16, 14, 12, 12])]*6)
-chisquare([16, 18, 16, 14, 12, 12])
-
-
+chisquare([16,17,16,18,15,15,16])
 
 
 # fig = plt.figure(dpi = 1300)
