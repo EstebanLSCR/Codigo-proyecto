@@ -397,13 +397,12 @@ mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
 
 fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
-for i in range(1, len(datos.FechaRegistro)+1):
+for i in range(1, len(datos.FechaRegistro)):
     temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
 
 
 meses = [mes[x.month-1] for x in fechas]
-#%%
 
 
 #%%
@@ -424,9 +423,6 @@ plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
 # parametros[1] = parametro 1
 # parametros[2] = parametros 2, ya viene como scale
 # ...
-
-parametros = ("normal", 1, 2)
-alpha = 0.95
 
 def VaR_alpha(alpha, parametros):
     
@@ -465,7 +461,6 @@ stats.kstest(logeados, "gennorm", args=(parametros_normal))
 stats.kstest(logeados, "gamma", args=(parametros_gamma))
 stats.kstest(logeados, "dweibull", args=(parametros_weibull))
 
-len(logeados2)
     
 stats.kstest(logeados2, "genpareto", args=(parametros_pareto2))
 stats.kstest(logeados2, "gennorm", args=(parametros_normal2))
@@ -476,7 +471,6 @@ stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 
 
 #%% Frecuencias
-len(meses)
 
 enero=0
 febrero=0
@@ -505,22 +499,22 @@ for i in range(0, len(meses)):
 
 
 
-meses2 = [enero,febrero,marzo,abril,mayo,junio]
-meses2
+# meses2 = [enero,febrero,marzo,abril,mayo,junio]
+# meses2
 
-np.mean(meses2)
-np.var(meses2)
+# np.mean(meses2)
+# np.var(meses2)
 
-chisquare(f_obs=meses2, f_exp=[np.mean(meses2)]*len(meses2))
-
-
+# chisquare(f_obs=meses2, f_exp=[np.mean(meses2)]*len(meses2))
 
 
-m2 = Fitter(meses2,distributions=['poisson','nbinom'])
-m2.fit()
 
-parametros_poisson = meses2.fitted_param['poisson']
-m2.summary()
+
+# m2 = Fitter(meses2,distributions=['poisson','nbinom'])
+# m2.fit()
+
+# parametros_poisson = meses2.fitted_param['poisson']
+# m2.summary()
 
 
 
@@ -537,12 +531,13 @@ dias = [0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,
 
 
 
-d = Fitter(dias,distributions=['poisson','nbinom', 'exponential'])
+d = Fitter(dias,distributions=['poisson','nbinom', 'geom'])
 d.fit()
-
 d.summary()
 
+
 chisquare(f_obs=dias, f_exp=[np.mean(dias)]*len(dias))
+chisquare(f_obs=dias)
 
 
 d2 = Fitter(dias)
@@ -552,6 +547,11 @@ d2.summary()
 m3 = Fitter(meses2)
 m3.fit()
 m3.summary()
+
+
+chisquare([16, 18, 16, 14, 12, 12], [np.mean([16, 18, 16, 14, 12, 12])]*6)
+chisquare([16, 18, 16, 14, 12, 12])
+
 
 
 
