@@ -85,36 +85,36 @@ plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 #%% Frecuencias
     #datos['mesO']=0
     #datos['mesD']=0
-for i in range(0,len(datos.MontoHistorico)):
-    datos.mesO[i]=(datos.FechaOcurrencia[i]).month
-    datos.mesR[i]=(datos.FechaRegistro[i]).month
+# for i in range(0,len(datos.MontoHistorico)):
+#     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
+#     datos.mesR[i]=(datos.FechaRegistro[i]).month
     
-#datos 
-#tipo: "O", "D"
-#...
+# #datos 
+# #tipo: "O", "D"
+# #...
 
-def F_frecuencias(datos):
-    #frec=[1,2,3,4,5,6,7,8,9,10,11,12]
-    frecO=datos["MontoHistorico"]
-    frecO=frecO[1:12]
-    #frecD=[1,2,3,4,5,6,7,8,9,10,11,12]
+# def F_frecuencias(datos):
+#     #frec=[1,2,3,4,5,6,7,8,9,10,11,12]
+#     frecO=datos["MontoHistorico"]
+#     frecO=frecO[1:12]
+#     #frecD=[1,2,3,4,5,6,7,8,9,10,11,12]
     
     
-    for i in range(1,13): 
-            frecO[i] = len((datos>>
-                               mask(X.mesO==i)).mesO)
+#     for i in range(1,13): 
+#             frecO[i] = len((datos>>
+#                                mask(X.mesO==i)).mesO)
             
-            #frecD[i] = len((datos>>
-                            #mask(X.mesD==i)).mesD)
+#             #frecD[i] = len((datos>>
+#                             #mask(X.mesD==i)).mesD)
             
-   # if(tipo=="O"):
-   #            frec = frecO
+#    # if(tipo=="O"):
+#    #            frec = frecO
                 
-   # elif(tipo=="D"):
-   #             frec = frecd
+#    # elif(tipo=="D"):
+#    #             frec = frecd
             
                 
-    return frecO
+#     return frecO
 
 
 #%%
@@ -397,9 +397,10 @@ mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
 
 fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
-for i in range(0, len(datos.FechaRegistro)):
+for i in range(1, len(datos.FechaRegistro)+1):
     temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
+
 
 meses = [mes[x.month-1] for x in fechas]
 #%%
@@ -472,20 +473,22 @@ stats.kstest(logeados2, "gamma", args=(parametros_gamma2))
 stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 
 
+
+
+#%% Frecuencias
 len(meses)
 
-stats.kstest(meses, "poisson")
-np.mean(meses)
-
-
+enero=0
 febrero=0
 marzo=0
 abril=0
 mayo=0
 junio=0
-julio=0
 for i in range(0, len(meses)):
-    if(meses[i]=='febrero'):
+    if(meses[i]=='enero'):
+       enero=enero+1
+       
+    elif(meses[i]=='febrero'):
        febrero=febrero+1
     
     elif(meses[i]=='marzo'):
@@ -500,25 +503,81 @@ for i in range(0, len(meses)):
     elif(meses[i]=='junio'):
        junio=junio+1
 
-    elif(meses[i]=='julio'):
-       julio=julio+1
 
 
-
-meses2 = [febrero,marzo,abril,mayo,junio,julio]
+meses2 = [enero,febrero,marzo,abril,mayo,junio]
 meses2
 
 np.mean(meses2)
 np.var(meses2)
 
+chisquare(f_obs=meses2, f_exp=[np.mean(meses2)]*len(meses2))
 
 
-from scipy.stats import poisson
-
-poisson.fit(meses2, loc = 2 )
 
 
-stats.kstest(meses2,"poisson",args=(125.5))
+m2 = Fitter(meses2,distributions=['poisson','nbinom'])
+m2.fit()
+
+parametros_poisson = meses2.fitted_param['poisson']
+m2.summary()
 
 
+
+
+
+dias = [0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,
+        0,0,0,0,1,15,0,1,0,0,0,0,17,0,0,0,0,0,0,7,16,12,
+        0,0,0,0,6,0,1,0,0,6,0,0,1,0,0,0,12,0,9,10,18,0,0,
+        2,0,19,1,0,0,0,1,1,15,2,1,0,0,24,0,1,2,14,0,0,3,4,
+        27,0,34,0,0,0,0,0,0,0,0,0,0,0,0,1,11,0,0,0,0,1,6,
+        0,0,0,0,28,0,0,0,0,0,25,0,5,8,2,0,0,0,16,2,1,0,0,
+        0,0,31,2,14,32,0,0,4,23,4,7,2,0,0,1,22,14,0,0,0,0,
+        0,51,0,7,1,0,0,4,7,4,0,7,0,0,1,16,6,28,8,0,0,0,0]
+
+
+
+d = Fitter(dias,distributions=['poisson','nbinom', 'exponential'])
+d.fit()
+
+d.summary()
+
+chisquare(f_obs=dias, f_exp=[np.mean(dias)]*len(dias))
+
+
+d2 = Fitter(dias)
+d2.fit()
+d2.summary()
+
+m3 = Fitter(meses2)
+m3.fit()
+m3.summary()
+
+
+
+# fig = plt.figure(dpi = 1300)
+
+# ax = fig.add_subplot(1, 1, 1)
+# sm.qqplot(logeados, stats.poisson, 
+#           distargs= (parametros_poisson[0],) , 
+#           loc = parametros_normal2[1], 
+#           scale = parametros_normal2[2],
+#           line = "45", ax = ax)
+# ax.set_title('Poisson', size = 11.0)
+# ax.set_xlabel("")
+# ax.set_ylabel("")
+# #ax.set_xlim([12, 17])
+# #ax.set_ylim([12, 17])
+
+
+
+# fig.tight_layout(pad=0.7)
+
+# fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
+# fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
+
+# fig.suptitle('Gráfico de cuantiles distribución para la frecuencia')
+# fig.subplots_adjust(top=0.86)
+
+# plt.show()
 
