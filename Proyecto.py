@@ -566,9 +566,6 @@ m3 = Fitter(meses2)
 m3.fit()
 m3.summary()
 
-chisquare([16,17,16,18,15,15,16])
-
-
 # fig = plt.figure(dpi = 1300)
 
 # ax = fig.add_subplot(1, 1, 1)
