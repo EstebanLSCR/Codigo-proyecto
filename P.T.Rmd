@@ -115,7 +115,7 @@ F.geom <- fitdist(diasTn, "geom")
 recl1 <- log(defraudaciones$MontoHistorico)
 recl2 <- defraudaciones$MontoHistorico
 
-#res1 <- fit.cont(data2fit=recl1)
+# res1 <- fit.cont(data2fit=recl1)
 
 
 # fitdist(log((defraudaciones$MontoHistorico), "pareto")
