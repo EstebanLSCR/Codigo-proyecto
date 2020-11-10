@@ -83,11 +83,22 @@ plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 
 #%% Frecuencias
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     #datos['mesO']=0
     #datos['mesD']=0
 # for i in range(0,len(datos.MontoHistorico)):
 #     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
 #     datos.mesR[i]=(datos.FechaRegistro[i]).month
+=======
+=======
+>>>>>>> Stashed changes
+    datos['mesO']=0
+    datos['mesR']=0
+for i in range(0,len(datos.MontoHistorico)):
+    datos.mesO[i]=(datos.FechaOcurrencia[i]).month
+    datos.mesR[i]=(datos.FechaRegistro[i]).month
+>>>>>>> Stashed changes
     
 # #datos 
 # #tipo: "O", "D"
@@ -100,9 +111,18 @@ plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 #     #frecD=[1,2,3,4,5,6,7,8,9,10,11,12]
     
     
+<<<<<<< Updated upstream
 #     for i in range(1,13): 
 #             frecO[i] = len((datos>>
 #                                mask(X.mesO==i)).mesO)
+=======
+    for i in range(1,13): 
+            frecO[i] = len((datos>>
+                               mask(X.mesR==i)).mesO)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
             
 #             #frecD[i] = len((datos>>
 #                             #mask(X.mesD==i)).mesD)
@@ -270,7 +290,7 @@ for i in range(0, len(datos.FechaDescubrimiento)):
                                "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
 
-meses = [x.month for x in fechas]
+meses = [x.month-1 for x in fechas]
 
 #df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
 #df["BigFrec"]=df["frecuenciaO"]>30
@@ -401,6 +421,17 @@ for i in range(1, len(datos.FechaRegistro)):
     temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+meses = [mes[x.month-1] for x in fechas]
+
+<<<<<<< HEAD
+#%%
+>>>>>>> Stashed changes
+=======
+meses = [mes[x.month-1] for x in fechas]
+>>>>>>> Stashed changes
 
 meses = [mes[x.month-1] for x in fechas]
 
@@ -547,9 +578,6 @@ d2.summary()
 m3 = Fitter(meses2)
 m3.fit()
 m3.summary()
-
-chisquare([16,17,16,18,15,15,16])
-
 
 # fig = plt.figure(dpi = 1300)
 
