@@ -84,12 +84,15 @@ plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 #%% Frecuencias
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     #datos['mesO']=0
     #datos['mesD']=0
 # for i in range(0,len(datos.MontoHistorico)):
 #     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
 #     datos.mesR[i]=(datos.FechaRegistro[i]).month
 =======
+=======
+>>>>>>> Stashed changes
     datos['mesO']=0
     datos['mesR']=0
 for i in range(0,len(datos.MontoHistorico)):
@@ -116,6 +119,9 @@ for i in range(0,len(datos.MontoHistorico)):
     for i in range(1,13): 
             frecO[i] = len((datos>>
                                mask(X.mesR==i)).mesO)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
             
 #             #frecD[i] = len((datos>>
@@ -416,6 +422,13 @@ for i in range(1, len(datos.FechaRegistro)):
     fechas = np.append(fechas, temp)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+meses = [mes[x.month-1] for x in fechas]
+
+<<<<<<< HEAD
+#%%
+>>>>>>> Stashed changes
 =======
 meses = [mes[x.month-1] for x in fechas]
 >>>>>>> Stashed changes
