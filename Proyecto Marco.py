@@ -550,7 +550,7 @@ f = np.array(datosF.Fechas.value_counts())
 
 frecuencias = np.concatenate((f,x))
 
-statsmodels.discrete.discrete_model.NegativeBinomial.fit(frecuencias)
+statsmodels.discrete.discrete_model.NegativeBinomial.fit(np.array(start_params=frecuencias))
 
 
 
