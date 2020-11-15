@@ -1,16 +1,11 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Oct 27 06:50:33 2020
+Created on Tue Nov 10 15:55:57 2020
 
-@author: Amel
-@author: Esteban
-@author: Marco
+@author: marcoantoniomejiaelizondo
 """
 
-
-# Código proyecto de riesgo
-
-#%%
 
 # Cargando paquetes y los datos
 import pandas as pd
@@ -21,11 +16,12 @@ from fitter import Fitter
 import statsmodels.api as sm
 from datetime import datetime
 from datetime import timedelta
-#from dfply import *
-#from bioinfokit.analys import stat
+from dfply import *
+from bioinfokit.analys import stat
 from scipy.stats import chisquare
 import datetime
 import seaborn as sns
+import statsmodels
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
@@ -83,18 +79,17 @@ plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 
 #%% Frecuencias
-
-#datos['mesO']=0
-#datos['mesD']=0
+    #datos['mesO']=0
+    #datos['mesD']=0
 # for i in range(0,len(datos.MontoHistorico)):
 #     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
 #     datos.mesR[i]=(datos.FechaRegistro[i]).month
-datos['mesO']=0
-datos['mesR']=0
-for i in range(0,len(datos.MontoHistorico)):
-    datos.mesO[i]=(datos.FechaOcurrencia[i]).month
-    datos.mesR[i]=(datos.FechaRegistro[i]).month
 
+#     datos['mesO']=0
+#     datos['mesR']=0
+# for i in range(0,len(datos.MontoHistorico)):
+#     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
+#     datos.mesR[i]=(datos.FechaRegistro[i]).month
     
 # #datos 
 # #tipo: "O", "D"
@@ -110,8 +105,9 @@ for i in range(0,len(datos.MontoHistorico)):
 #     for i in range(1,13): 
 #             frecO[i] = len((datos>>
 #                                mask(X.mesO==i)).mesO)
-#for i in range(1,13): 
-#    frecO[i] = len((datos.mask(X.mesR==i)).mesO)
+    # for i in range(1,13): 
+    #         frecO[i] = len((datos>>
+    #                            mask(X.mesR==i)).mesO)
             
 #             #frecD[i] = len((datos>>
 #                             #mask(X.mesD==i)).mesD)
@@ -272,15 +268,14 @@ plt.show()
 
 #%%
 
-fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
-                               "%Y-%m-%d %H:%M:%S") ])
+# fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
+#                                "%Y-%m-%d %H:%M:%S") ])
+# for i in range(0, len(datos.FechaDescubrimiento)):
+#     temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
+#                                "%Y-%m-%d %H:%M:%S")
+#     fechas = np.append(fechas, temp)
 
-for i in range(1, len(datos.FechaDescubrimiento)):
-    temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
-                               "%Y-%m-%d %H:%M:%S")
-    fechas = np.append(fechas, temp)
-
-meses = [x.month-1 for x in fechas]
+# meses = [x.month-1 for x in fechas]
 
 #df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
 #df["BigFrec"]=df["frecuenciaO"]>30
@@ -402,7 +397,15 @@ fig.subplots_adjust(top=0.86)
 
 plt.show()
 
+
+
+
+
+
+
+
 #%%
+
 mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
 
@@ -413,10 +416,6 @@ for i in range(1, len(datos.FechaRegistro)):
 
 meses = [mes[x.month-1] for x in fechas]
 
-#%%
-meses = [mes[x.month-1] for x in fechas]
-
-meses = [mes[x.month-1] for x in fechas]
 
 
 #%%
@@ -438,100 +437,35 @@ plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
 # parametros[2] = parametros 2, ya viene como scale
 # ...
 
-def VaR_alpha(alpha, parametros):
+# def VaR_alpha(alpha, parametros):
     
-    if(parametros[0] == "gennormal"):
-        from scipy.stats import gennorm
-        VaR = gennorm.ppf(alpha,parametros[1],parametros[2])
+#     if(parametros[0] == "gennormal"):
+#         from scipy.stats import gennorm
+#         VaR = gennorm.ppf(alpha,parametros[1],parametros[2])
         
-    elif(parametros[0] == "normal"):
-        from scipy.stats import norm
-        VaR = norm.ppf(alpha,parametros[1],parametros[2])
+#     elif(parametros[0] == "normal"):
+#         from scipy.stats import norm
+#         VaR = norm.ppf(alpha,parametros[1],parametros[2])
     
-    elif(parametros[0] == "gamma"):
-        from scipy.stats import gamma
-        VaR = gamma.ppf(alpha,parametros[1],scale=parametros[2])
+#     elif(parametros[0] == "gamma"):
+#         from scipy.stats import gamma
+#         VaR = gamma.ppf(alpha,parametros[1],scale=parametros[2])
     
-    elif(parametros[0] == "pareto"):
-        from scipy.stats import pareto
-        VaR = pareto.ppf(q=alpha,b=parametros[1],scale=parametros[2])
+#     elif(parametros[0] == "pareto"):
+#         from scipy.stats import pareto
+#         VaR = pareto.ppf(q=alpha,b=parametros[1],scale=parametros[2])
     
-    elif(parametros[0] == "weibull"):
-        from scipy.stats import weibull
-        VaR = weibull.ppf(q=alpha,b=parametros[1],scale=parametros[2])
+#     elif(parametros[0] == "weibull"):
+#         from scipy.stats import weibull
+#         VaR = weibull.ppf(q=alpha,b=parametros[1],scale=parametros[2])
     
-    else: #(parametros[0] == "lognorm"):
-        from scipy.stats import lognorm
-        VaR = lognorm.ppf(q=alpha,b=parametros[1],scale=parametros[2])
+#     else: #(parametros[0] == "lognorm"):
+#         from scipy.stats import lognorm
+#         VaR = lognorm.ppf(q=alpha,b=parametros[1],scale=parametros[2])
         
-    return VaR
+#     return VaR
     
 
-            
-#%%
-
-#### Algoritmo para las simulaciones todo en escala logarítmica
-
-# m: numero de simulaciones
-m = 1000
-# Umbral para teoría del valor extremo
-q = 0.95
-# parámetros binomial negativa
-
-r =  0.1746875
-mu = 4.1290508
-p = r/(r + mu)
-r = r*365
-
-parametros_nbinom = np.array([p,r])
-
-# Función para sampleo de la distribución empírica
-
-def sampleo_distr_empirica(n):
-    ''' 
-    n = tamaño del sampleo
-    '''
-    uniformes = np.random.uniform(size = n)
-    sampleo = np.quantile(logeados[logeados < np.quantile(logeados, q)], 
-                          uniformes)
-    return sampleo
-    
-
-# vector de totales
-totales = np.zeros(m) 
-
-# Simulaciones
-# Se fija la semilla para obtener replicar los resultados 
-np.random.seed(100)
-
-# Genere vector de variables N_1 , ... , N_m
-Frecuencias = stats.nbinom.rvs(m, p = parametros_nbinom[0],
-                               loc = 0, size = parametros_nbinom[1])
-
-for j in range(0,m):
-    # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
-    Uniformes = np.random.uniform(size = Frecuencias[j])
-    # Vector de reclamaciones
-    Reclamaciones = np.zeros(Frecuencias[j])
-    
-    # Reclamaciones con distribución empírica
-    empirica = Uniformes < q
-    
-    # Sampleo reclamaciones según distribución empírica
-    Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
-    # Sampleo reclamaciones según distribución generalizada de pareto
-    Reclamaciones[not empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
-                        loc = parametros_pareto2[1], scale = parametros_pareto2[2],
-                        size = sum(Uniformes >= q))
-    # Se guardan la suma de las reclamaciones
-    totales[j] = sum(Reclamaciones) 
-
-    
-    
-    
-    
-    
-    
 
 #%% Pruebas KS
 
@@ -551,34 +485,34 @@ stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 
 #%% Frecuencias
 
-enero=0
-febrero=0
-marzo=0
-abril=0
-mayo=0
-junio=0
-for i in range(0, len(meses)):
-    if(meses[i]=='enero'):
-       enero=enero+1
+# enero=0
+# febrero=0
+# marzo=0
+# abril=0
+# mayo=0
+# junio=0
+# for i in range(0, len(meses)):
+#     if(meses[i]=='enero'):
+#        enero=enero+1
        
-    elif(meses[i]=='febrero'):
-       febrero=febrero+1
+#     elif(meses[i]=='febrero'):
+#        febrero=febrero+1
     
-    elif(meses[i]=='marzo'):
-       marzo=marzo+1
+#     elif(meses[i]=='marzo'):
+#        marzo=marzo+1
 
-    elif(meses[i]=='abril'):
-       abril=abril+1
+#     elif(meses[i]=='abril'):
+#        abril=abril+1
 
-    elif(meses[i]=='mayo'):
-       mayo=mayo+1
+#     elif(meses[i]=='mayo'):
+#        mayo=mayo+1
        
-    elif(meses[i]=='junio'):
-       junio=junio+1
+#     elif(meses[i]=='junio'):
+#        junio=junio+1
 
 
 
-meses2 = [enero,febrero,marzo,abril,mayo,junio]
+# meses2 = [enero,febrero,marzo,abril,mayo,junio]
 # meses2
 
 # np.mean(meses2)
@@ -599,56 +533,55 @@ meses2 = [enero,febrero,marzo,abril,mayo,junio]
 
 
 
-dias = [0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,
-        0,0,0,0,1,15,0,1,0,0,0,0,17,0,0,0,0,0,0,7,16,12,
-        0,0,0,0,6,0,1,0,0,6,0,0,1,0,0,0,12,0,9,10,18,0,0,
-        2,0,19,1,0,0,0,1,1,15,2,1,0,0,24,0,1,2,14,0,0,3,4,
-        27,0,34,0,0,0,0,0,0,0,0,0,0,0,0,1,11,0,0,0,0,1,6,
-        0,0,0,0,28,0,0,0,0,0,25,0,5,8,2,0,0,0,16,2,1,0,0,
-        0,0,31,2,14,32,0,0,4,23,4,7,2,0,0,1,22,14,0,0,0,0,
-        0,51,0,7,1,0,0,4,7,4,0,7,0,0,1,16,6,28,8,0,0,0,0]
 
 
 
-d = Fitter(dias,distributions=['poisson','nbinom', 'geom'])
-d.fit()
-d.summary()
 
+# from datetime import datetime, timedelta
+fechas = datos.FechaRegistro
+inicio = datetime(2020,1,1)
+fin    = datetime(2020,6,30)
 
-chisquare(f_obs=dias, f_exp=[np.mean(dias)]*len(dias))
-chisquare(f_obs=dias)
+datosF = pd.DataFrame({'Fechas' : datos.FechaRegistro})
 
+x = np.arange((fin - inicio).days + 1 - datosF.nunique(0).Fechas)*0
 
-d2 = Fitter(dias)
-d2.fit()
-d2.summary()
+f = np.array(datosF.Fechas.value_counts())
 
-m3 = Fitter(meses2)
-m3.fit()
-m3.summary()
+frecuencias = np.concatenate((f,x))
 
-# fig = plt.figure(dpi = 1300)
-
-# ax = fig.add_subplot(1, 1, 1)
-# sm.qqplot(logeados, stats.poisson, 
-#           distargs= (parametros_poisson[0],) , 
-#           loc = parametros_normal2[1], 
-#           scale = parametros_normal2[2],
-#           line = "45", ax = ax)
-# ax.set_title('Poisson', size = 11.0)
-# ax.set_xlabel("")
-# ax.set_ylabel("")
-# #ax.set_xlim([12, 17])
-# #ax.set_ylim([12, 17])
+statsmodels.discrete.discrete_model.NegativeBinomial.fit(np.array(start_params=frecuencias))
 
 
 
-# fig.tight_layout(pad=0.7)
 
-# fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
-# fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
+# dias = np.array([0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,
+#                  0,0,0,0,1,15,0,1,0,0,0,0,17,0,0,0,0,0,0,7,16,12,
+#                  0,0,0,0,6,0,1,0,0,6,0,0,1,0,0,0,12,0,9,10,18,0,0,
+#                  2,0,19,1,0,0,0,1,1,15,2,1,0,0,24,0,1,2,14,0,0,3,4,
+#                  27,0,34,0,0,0,0,0,0,0,0,0,0,0,0,1,11,0,0,0,0,1,6,
+#                  0,0,0,0,28,0,0,0,0,0,25,0,5,8,2,0,0,0,16,2,1,0,0,
+#                  0,0,31,2,14,32,0,0,4,23,4,7,2,0,0,1,22,14,0,0,0,0,
+#                  0,51,0,7,1,0,0,4,7,4,0,7,0,0,1,16,6,28,8,0,0,0,0])
 
-# fig.suptitle('Gráfico de cuantiles distribución para la frecuencia')
-# fig.subplots_adjust(top=0.86)
 
-# plt.show()
+
+
+# d = Fitter(dias,distributions=['poisson','nbinom', 'geom'])
+# d.fit()
+# d.summary()
+
+
+# chisquare(f_obs=dias, f_exp=[np.mean(dias)]*len(dias))
+# chisquare(f_obs=dias)
+
+
+# d2 = Fitter(dias)
+# d2.fit()
+# d2.summary()
+
+
+
+
+
+
