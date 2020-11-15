@@ -21,8 +21,8 @@ from fitter import Fitter
 import statsmodels.api as sm
 from datetime import datetime
 from datetime import timedelta
-from dfply import *
-from bioinfokit.analys import stat
+#from dfply import *
+#from bioinfokit.analys import stat
 from scipy.stats import chisquare
 import datetime
 import seaborn as sns
@@ -254,7 +254,8 @@ plt.show()
 
 fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
                                "%Y-%m-%d %H:%M:%S") ])
-for i in range(0, len(datos.FechaDescubrimiento)):
+
+for i in range(1, len(datos.FechaDescubrimiento)):
     temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
                                "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
@@ -443,6 +444,82 @@ def VaR_alpha(alpha, parametros):
     
 
 #%%Frecuencias
-for i in 1:len(datos.MontoHistorico):
+#for i in 1:len(datos.MontoHistorico):
         
     
+#%%
+
+#### Algoritmo para las simulaciones todo en escala logarítmica
+
+# m: numero de simulaciones
+m = 1000
+# Umbral para teoría del valor extremo
+q = 0.95
+# parámetros binomial negativa
+
+r =  0.1746875
+mu = 4.1290508
+p = r/(r + mu)
+r = r*365
+
+parametros_nbinom = np.array([p,r])
+
+# Función para sampleo de la distribución empírica
+
+def sampleo_distr_empirica(n):
+    ''' 
+    n = tamaño del sampleo
+    '''
+    uniformes = np.random.uniform(size = n)
+    sampleo = np.quantile(logeados[logeados < np.quantile(logeados, q)], 
+                          uniformes)
+    return sampleo
+    
+
+# vector de totales
+totales = np.zeros(m) 
+
+# Simulaciones
+# Se fija la semilla para obtener replicar los resultados 
+np.random.seed(100)
+
+# Genere vector de variables N_1 , ... , N_m
+Frecuencias = stats.nbinom.rvs(m, p = parametros_nbinom[0],
+                               loc = 0, size = parametros_nbinom[1])
+
+for j in range(0,m):
+    # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
+    Uniformes = np.random.uniform(size = Frecuencias[j])
+    # Vector de reclamaciones
+    Reclamaciones = np.zeros(Frecuencias[j])
+    
+    # Reclamaciones con distribución empírica
+    empirica = Uniformes < q
+    
+    # Sampleo reclamaciones según distribución empírica
+    Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
+    # Sampleo reclamaciones según distribución generalizada de pareto
+    Reclamaciones[not empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
+                        loc = parametros_pareto2[1], scale = parametros_pareto2[2],
+                        size = sum(Uniformes >= q))
+    # Se guardan la suma de las reclamaciones
+    totales[j] = sum(Reclamaciones) 
+
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
