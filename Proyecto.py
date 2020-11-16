@@ -21,11 +21,10 @@ from fitter import Fitter
 import statsmodels.api as sm
 from datetime import datetime
 from datetime import timedelta
-#from dfply import *
-#from bioinfokit.analys import stat
 from scipy.stats import chisquare
 import datetime
 import seaborn as sns
+import locale
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
@@ -79,7 +78,7 @@ plt.ylabel('Densidad')
 # Para salvar imagen
 ## plt.savefig('Prueba.svg', format='svg', dpi=1200)
 
-plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
+# plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 
 #%% Frecuencias
@@ -413,10 +412,6 @@ for i in range(1, len(datos.FechaRegistro)):
 
 meses = [mes[x.month-1] for x in fechas]
 
-#%%
-meses = [mes[x.month-1] for x in fechas]
-
-meses = [mes[x.month-1] for x in fechas]
 
 
 #%%
@@ -468,70 +463,7 @@ def VaR_alpha(alpha, parametros):
     
 
             
-#%%
 
-#### Algoritmo para las simulaciones todo en escala logarítmica
-
-# m: numero de simulaciones
-m = 1000
-# Umbral para teoría del valor extremo
-q = 0.95
-# parámetros binomial negativa
-
-r =  0.1746875
-mu = 4.1290508
-p = r/(r + mu)
-r = r*365
-
-parametros_nbinom = np.array([p,r])
-
-# Función para sampleo de la distribución empírica
-
-def sampleo_distr_empirica(n):
-    ''' 
-    n = tamaño del sampleo
-    '''
-    uniformes = np.random.uniform(size = n)
-    sampleo = np.quantile(logeados[logeados < np.quantile(logeados, q)], 
-                          uniformes)
-    return sampleo
-    
-
-# vector de totales
-totales = np.zeros(m) 
-
-# Simulaciones
-# Se fija la semilla para obtener replicar los resultados 
-np.random.seed(100)
-
-# Genere vector de variables N_1 , ... , N_m
-Frecuencias = stats.nbinom.rvs(m, p = parametros_nbinom[0],
-                               loc = 0, size = parametros_nbinom[1])
-
-for j in range(0,m):
-    # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
-    Uniformes = np.random.uniform(size = Frecuencias[j])
-    # Vector de reclamaciones
-    Reclamaciones = np.zeros(Frecuencias[j])
-    
-    # Reclamaciones con distribución empírica
-    empirica = Uniformes < q
-    
-    # Sampleo reclamaciones según distribución empírica
-    Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
-    # Sampleo reclamaciones según distribución generalizada de pareto
-    Reclamaciones[not empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
-                        loc = parametros_pareto2[1], scale = parametros_pareto2[2],
-                        size = sum(Uniformes >= q))
-    # Se guardan la suma de las reclamaciones
-    totales[j] = sum(Reclamaciones) 
-
-    
-    
-    
-    
-    
-    
 
 #%% Pruebas KS
 
@@ -652,3 +584,254 @@ m3.summary()
 # fig.subplots_adjust(top=0.86)
 
 # plt.show()
+
+
+#%% Conteo de reclamos por día
+
+
+rango_fechas = pd.date_range(datos['FechaRegistro'][0] - datetime.timedelta(days = 1), 
+        end = datos['FechaRegistro'].max() + datetime.timedelta(days = 4) ).to_pydatetime().tolist()
+
+
+fechas_vistas = np.array([datetime.datetime.strptime(str(x), 
+                    "%Y-%m-%d %H:%M:%S") for x in datos.FechaRegistro ])
+
+
+conteo_dias = np.zeros(len(rango_fechas))
+
+for i in range(0,len(rango_fechas)):
+    conteo_dias[i] = sum(fechas_vistas == rango_fechas[i])
+
+
+df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
+
+
+plt.hist(data=df, x="Conteo", bins = len(conteo_dias));
+plt.title("Histograma para el número de reclamos por día")
+plt.xlabel('Número de reclamos')
+plt.ylabel("Conteo")
+
+
+#%%
+
+## Parámetros obtenidos en R para la binomial negativa
+mu = 4.129051
+size = 0.174687
+prob = size/(size + mu)
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
+cuantil_observado = np.quantile(conteo_dias, q)
+
+
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+
+ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
+ax1.plot([0, 50], [0, 50], color = "red")
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
+
+
+cdf_teorico = stats.nbinom.cdf(cuantil_teorico, n = size, p = prob)
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+         color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
+
+
+pp_plot(conteo_dias , stats.nbinom(n = size, p=prob) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
+       
+
+densidad_teorica = stats.nbinom.pmf(np.unique(conteo_dias), n = size, p = prob)
+
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+         label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+         label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
+
+fig.suptitle("Ajuste binomial negativa", fontsize=14)
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
+
+plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
+
+plt.show()
+
+#%%
+
+## Parámetros obtenidos para la poisson
+lamb = np.mean(conteo_dias)
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.poisson.ppf(q, mu = lamb)
+cuantil_observado = np.quantile(conteo_dias, q)
+
+
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+
+ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
+ax1.plot([0, 50], [0, 50], color = "red")
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
+
+
+cdf_teorico = stats.poisson.cdf(cuantil_teorico, mu = lamb )
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+         color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
+
+pp_plot(conteo_dias , stats.poisson(mu = lamb) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
+       
+
+densidad_teorica = stats.poisson.pmf(np.unique(conteo_dias), mu = lamb)
+
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+         label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+         label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
+
+
+fig.suptitle("Ajuste Poisson", fontsize=14)
+
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
+
+plt.savefig('Frecuencias_poisson.jpeg', format='jpeg', dpi=1300)
+
+plt.show()
+
+
+#%%
+
+## Pruebas ks
+#stats.kstest(conteo_dias, "poisson", args = (lamb,))
+#stats.kstest(conteo_dias, "nbinom", args=(size, prob ))
+
+#%%
+
+logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+f2 = Fitter(np.exp(logeados2),  distributions= 'genpareto')
+f2.fit()
+parametros_pareto2 =  f2.fitted_param['genpareto']
+
+
+#%%
+
+#### Algoritmo para las simulaciones todo en escala logarítmica
+
+# m: numero de simulaciones
+m = 10000
+# Umbral para teoría del valor extremo
+q = 0.95
+# parámetros binomial negativa
+
+mu = 4.129051
+size = 0.174687
+prob = size/(size + mu)
+#size = 0.2730495
+size = size*365
+
+parametros_nbinom = np.array([size,prob])
+
+# Función para sampleo de la distribución empírica
+
+def sampleo_distr_empirica(n):
+    ''' 
+    n = tamaño del sampleo
+    '''
+    uniformes = np.random.uniform(size = n)
+    sampleo = np.quantile(np.exp(logeados[logeados < np.quantile(logeados, q)]), 
+                          uniformes)
+    return sampleo
+    
+
+# vector de totales
+totales = np.zeros(m) 
+
+# Simulaciones
+# Se fija la semilla para obtener replicar los resultados 
+np.random.seed(100)
+
+# Genere vector de variables N_1 , ... , N_m
+Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
+                               p = parametros_nbinom[1],
+                               loc = 0, size = m)
+
+#maximos = np.zeros(m) 
+#no_empiricas = np.zeros(m) 
+for j in range(0,m):
+    # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
+    Uniformes = np.random.uniform(size = Frecuencias[j])
+    # Vector de reclamaciones
+    Reclamaciones = np.zeros(Frecuencias[j])
+    
+    # Reclamaciones con distribución empírica
+    empirica = Uniformes < q
+    
+    # Sampleo reclamaciones según distribución empírica
+    Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
+    # Sampleo reclamaciones según distribución generalizada de pareto
+    Reclamaciones[~ empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
+                        loc = parametros_pareto2[1], scale = parametros_pareto2[2],
+                        size = sum(Uniformes > q))
+    #maximos[j] = max(Reclamaciones)
+    #no_empiricas[j] = sum(Uniformes > q)
+    
+    # Se guardan la suma de las reclamaciones
+    # Elimina el efecto de los logarítmos
+    totales[j] = sum(Reclamaciones)
+
+#%%
+
+#Media
+locale.format_string("%d", np.mean(totales) , grouping=True)
+
+# Var 99
+Var = np.quantile(totales, q = 0.99)
+locale.format_string("%d", Var , grouping=True)
+
+# ES 99
+ES =  np.mean(totales[totales > Var])
+locale.format_string("%d",ES, grouping=True)
+
+
+#%%
+
+# Gráfico histograma de totales
+plt.hist(np.log(totales))
+plt.title("Histograma de los totales simulados")
+plt.xlabel('Logaritmo de los totales')
+plt.ylabel('Conteo') 
+
+plt.show()
+
+
