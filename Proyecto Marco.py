@@ -14,14 +14,11 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from fitter import Fitter
 import statsmodels.api as sm
-from datetime import datetime
-from datetime import timedelta
 from dfply import *
 from bioinfokit.analys import stat
 from scipy.stats import chisquare
 import datetime
 import seaborn as sns
-import statsmodels
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
@@ -536,22 +533,34 @@ stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 
 
 
-
-# from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 fechas = datos.FechaRegistro
 inicio = datetime(2020,1,1)
 fin    = datetime(2020,6,30)
 
 datosF = pd.DataFrame({'Fechas' : datos.FechaRegistro})
 
-x = np.arange((fin - inicio).days + 1 - datosF.nunique(0).Fechas)*0
+ceros = np.arange((fin - inicio).days + 1 - datosF.nunique(0).Fechas)*0
 
 f = np.array(datosF.Fechas.value_counts())
 
-frecuencias = np.concatenate((f,x))
+frecuencias = np.concatenate((f,ceros))
 
-statsmodels.discrete.discrete_model.NegativeBinomial.fit(np.array(start_params=frecuencias))
+# x = np.array([63.76094, 0.9391803])
+x = np.arange(len(frecuencias))*0+1 # Falta calcular este
 
+from statsmodels.discrete.discrete_model import NegativeBinomial, NegativeBinomialResults
+ajusteNB = NegativeBinomial(endog=frecuencias, exog=x)
+parametrosNB = ajusteNB.fit()
+parametrosNB.summary()
+ajusteNB.summary()
+
+len(f)/(len(frecuencias)+77)
+
+# y=np.ones(len(frecuencias))
+# ja = statsmodels.discrete.discrete_model.NegativeBinomial(endog=frecuencias, exog=frecuencias)
+
+# statsmodels.discrete.discrete_model.NegativeBinomial.fit(np.array(start_params=frecuencias))
 
 
 
