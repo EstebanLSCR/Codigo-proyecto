@@ -624,6 +624,7 @@ cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
 cuantil_observado = np.quantile(conteo_dias, q)
 
 
+
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
 ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
@@ -672,6 +673,67 @@ plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
 plt.show()
 
 #%%
+
+## Parámetros obtenidos en R para la geometrica
+p = 0.1948608
+
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.geom.ppf(q , p)
+cuantil_observado = np.quantile(conteo_dias, q)
+
+
+
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+
+ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
+ax1.plot([0, 50], [0, 50], color = "red")
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
+
+
+cdf_teorico = stats.geom.cdf(cuantil_teorico, p = p)
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+         color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
+
+
+pp_plot(conteo_dias , stats.geom(p=p) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
+       
+
+densidad_teorica = stats.geom.pmf(np.unique(conteo_dias), p = p)
+
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+         label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+         label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
+
+fig.suptitle("Ajuste geométrica", fontsize=14)
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
+
+plt.savefig('Frecuencias_geometrica.jpeg', format='jpeg', dpi=1300)
+
+plt.show()
+
+#%%
+
+
 
 ## Parámetros obtenidos para la poisson
 lamb = np.mean(conteo_dias)
@@ -750,7 +812,7 @@ parametros_pareto2 =  f2.fitted_param['genpareto']
 
 # m: numero de simulaciones
 m = 10000
-# Umbral para teoría del valor extremo
+    # Umbral para teoría del valor extremo
 q = 0.95
 # parámetros binomial negativa
 
@@ -811,6 +873,7 @@ for j in range(0,m):
     totales[j] = sum(Reclamaciones)
 
 #%%
+logeados
 
 #Media
 locale.format_string("%d", np.mean(totales) , grouping=True)
@@ -831,6 +894,9 @@ plt.hist(np.log(totales))
 plt.title("Histograma de los totales simulados")
 plt.xlabel('Logaritmo de los totales')
 plt.ylabel('Conteo') 
+
+
+plt.savefig('hist_de los totales simulados.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
