@@ -28,55 +28,55 @@ defraudaciones <- read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 ```{r}
 fechas <- defraudaciones$FechaRegistro
-
-F.lambda.Diario <- function(fechas){
-  return( as.double( mean( fechas[-1] - fechas[-length(fechas)]) ) )
-}
-
-F.lambda.Semestral <- function(fechas){
-  return( as.double( mean( fechas[-1] - fechas[-length(fechas)])/(365/2) ) )
-}
-
-F.lambda.Diario(fechas)
-
-F.lambda.Semestral(sort(fechas))
-
-
-meses <- month(defraudaciones$FechaRegistro)
-
-enero=0
-febrero=0
-marzo=0
-abril=0
-mayo=0
-junio=0
-for (i in 1:length(meses)){
-  if(meses[i]==1){
-       enero=enero+1
-       }
-    else if(meses[i]==2){
-       febrero=febrero+1
-       }
-    else if(meses[i]==3){
-       marzo=marzo+1
-       }
-
-    else if(meses[i]==4)
-       abril=abril+1
-
-    else if(meses[i]==5)
-       mayo=mayo+1
-       
-    else if(meses[i]==6){
-       junio=junio+1}
-
-}
-
-
-meses2 = c(enero,febrero,marzo,abril,mayo,junio)
-meses2
-
-mean(meses2)
+# 
+# F.lambda.Diario <- function(fechas){
+#   return( as.double( mean( fechas[-1] - fechas[-length(fechas)]) ) )
+# }
+# 
+# F.lambda.Semestral <- function(fechas){
+#   return( as.double( mean( fechas[-1] - fechas[-length(fechas)])/(365/2) ) )
+# }
+# 
+# F.lambda.Diario(fechas)
+# 
+# F.lambda.Semestral(sort(fechas))
+# 
+# 
+# meses <- month(defraudaciones$FechaRegistro)
+# 
+# enero=0
+# febrero=0
+# marzo=0
+# abril=0
+# mayo=0
+# junio=0
+# for (i in 1:length(meses)){
+#   if(meses[i]==1){
+#        enero=enero+1
+#        }
+#     else if(meses[i]==2){
+#        febrero=febrero+1
+#        }
+#     else if(meses[i]==3){
+#        marzo=marzo+1
+#        }
+# 
+#     else if(meses[i]==4)
+#        abril=abril+1
+# 
+#     else if(meses[i]==5)
+#        mayo=mayo+1
+#        
+#     else if(meses[i]==6){
+#        junio=junio+1}
+# 
+# }
+# 
+# 
+# meses2 = c(enero,febrero,marzo,abril,mayo,junio)
+# meses2
+# 
+# mean(meses2)
 
 
 
@@ -99,28 +99,28 @@ cumsum(diasTn)
 
 
 
-F.nbinom <- fitdist(diasTn, "nbinom")
-F.pois <- fitdist(diasTn, "pois")
-F.geom <- fitdist(diasTn, "geom")
-
-
-plot(F.pois)
-plot(F.pois, demp = TRUE)
-plot(F.pois, histo = FALSE, demp = TRUE)
-
-cdfcomp(F.pois, addlegend=FALSE)
-denscomp(F.pois, addlegend=FALSE)
-ppcomp(F.pois, addlegend=FALSE)
-qqcomp(F.pois, addlegend=FALSE)
-
-plot(F.geom)
-plot(F.geom, demp = TRUE)
-plot(F.geom, histo = FALSE, demp = TRUE)
-
-cdfcomp(F.geom, addlegend=FALSE)
-denscomp(F.geom, addlegend=FALSE)
-ppcomp(F.geom, addlegend=FALSE)
-qqcomp(F.geom, addlegend=FALSE)
+F.nbinom <- fitdist(diasTn, "nbinom", method="mme")
+F.pois <- fitdist(diasTn, "pois", "mme")
+F.geom <- fitdist(diasTn, "geom", "mme")
+# 
+# 
+# plot(F.pois)
+# plot(F.pois, demp = TRUE)
+# plot(F.pois, histo = FALSE, demp = TRUE)
+# 
+# cdfcomp(F.pois, addlegend=FALSE)
+# denscomp(F.pois, addlegend=FALSE)
+# ppcomp(F.pois, addlegend=FALSE)
+# qqcomp(F.pois, addlegend=FALSE)
+# 
+# plot(F.geom)
+# plot(F.geom, demp = TRUE)
+# plot(F.geom, histo = FALSE, demp = TRUE)
+# 
+# cdfcomp(F.geom, addlegend=FALSE)
+# denscomp(F.geom, addlegend=FALSE)
+# ppcomp(F.geom, addlegend=FALSE)
+# qqcomp(F.geom, addlegend=FALSE)
 
 plot(F.nbinom)
 plot(F.nbinom, demp = TRUE)
@@ -139,183 +139,418 @@ qqcomp(F.nbinom, addlegend=FALSE)
 ```
 
 
-
 ```{r}
+# diario
+n <- length(diasTn)
+m <- mean(diasTn)
+v <- (n - 1)/n * var(diasTn)
+size <- m^2/(v - m)
+p <- size/(size+m)
 
-recl1 <- log(defraudaciones$MontoHistorico)
-recl2 <- defraudaciones$MontoHistorico
+n
+m
+v
+size
+p
+```
+```{r}
+# anual
+n <- length(diasTn)
+m <- mean(diasTn)
+v <- (n - 1)/n * var(diasTn)
+size <- (m^2/(v - m))*365
+p <- size/(size+m)
 
-res1 <- fit.cont(data2fit=diasTn)
-
-
-# fitdist(log((defraudaciones$MontoHistorico), "pareto")
-# fitdist(defraudaciones$MontoHistorico, "pareto")
-# fitdist(((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico), "pareto")
-# hist(recl1)
-# hist(recl2)
-
-hist((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico)
-hist(log((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico))
-
-
-# 75%
-x1 <- (defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico
-x2 <- log((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico)
-
-# fit.cont(data2fit=x1)
-# fit.cont(data2fit=x2)
-
-# 99%
-y1 <- (defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico
-y2 <- log((defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico)
-
-# fit.cont(data2fit=y1)
-# fit.cont(data2fit=y2)
+n
+m
+v
+size
+p
 ```
 
 ```{r}
-quantile(defraudaciones$MontoHistorico,0.99)
-```
-
-
-```{r}
-hist(((defraudaciones %>% filter(MontoHistorico<7000000))$MontoHistorico))
-hist(log((defraudaciones %>% filter(MontoHistorico<7000000))$MontoHistorico))
+# mme anual
+F.nbinom <- fitdist(diasTn, "nbinom", method="mme")
+F.nbinom$estimate[[1]]*365
+(F.nbinom$estimate[[1]]*365) / (F.nbinom$estimate[[2]]+F.nbinom$estimate[[1]]*365)
 ```
 
 ```{r}
-defraudaciones <- defraudaciones %>% mutate(MesD = month(defraudaciones$FechaDescubrimiento),
-                                            MesO = month(defraudaciones$FechaOcurrencia),
-                                            MesR = month(defraudaciones$FechaRegistro))
+# mle anual
+F.nbinom <- fitdist(diasTn, "nbinom", method="mle")
+F.nbinom$estimate[[1]]*365
+(F.nbinom$estimate[[1]]*365) / (F.nbinom$estimate[[2]]+F.nbinom$estimate[[1]]*365)
+```
 
-plot(defraudaciones$MesD)
-plot(defraudaciones$MesO)
-plot(defraudaciones$MesR)
+```{r}
+F.pois <- fitdist(diasTn, "pois", "mme")
+F.geom <- fitdist(diasTn, "geom", "mme")
+1/(1 + m) - F.geom$estimate[[1]]
+m-fitdist(diasTn, "pois", "mme")[[1]]
+```
 
-defraudaciones
 
 
-# "O" ocurrencia
-# "D" descubrimiento
-F.Frecuencias <- function(datos, tipo){
-  if(tipo == "R"){
-      datost <- datos %>% mutate(Mes = month(datos$FechaRegistro))
-    }else{
-      datost <- datos %>% mutate(Mes = month(datos$FechaDescubrimiento))
+```{r}
+function (data, distr, order, memp, start = NULL, fix.arg = NULL, 
+    optim.method = "default", lower = -Inf, upper = Inf, custom.optim = NULL, 
+    weights = NULL, silent = TRUE, gradient = NULL, checkstartfix = FALSE, 
+    ...) 
+{
+    if (!is.character(distr)) 
+        stop("distr must be a character string naming a distribution")
+    else distname <- distr
+    if (is.element(distname, c("norm", "lnorm", "pois", "exp", 
+        "gamma", "nbinom", "geom", "beta", "unif", "logis"))) 
+        meth <- "closed formula"
+    else meth <- optim.method
+    mdistname <- paste("m", distname, sep = "")
+    ddistname <- paste("d", distname, sep = "")
+    argddistname <- names(formals(ddistname))
+    if (is.null(custom.optim)) 
+        optim.method <- match.arg(optim.method, c("default", 
+            "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", 
+            "Brent"))
+    if (!is.null(weights)) {
+        if (any(weights < 0)) 
+            stop("weights should be a vector of integers greater than 0")
+        if (!is.allint.w(weights)) 
+            stop("weights should be a vector of (strictly) positive integers")
+        if (length(weights) != NROW(data)) 
+            stop("weights should be a vector with a length equal to the observation number")
+        warning("weights are not taken into account in the default initial values")
     }
-  
-  frec <- c()
-  
-    for (i in 1:12) {
-      frec[i] <- count(datost %>% filter(Mes == i))[[1]]
+    if (meth != "closed formula") {
+        if (!exists(mdistname, mode = "function")) 
+            stop(paste0("The moment ", mdistname, " function must be defined."))
     }
-  return( frec )
+    if (!(is.numeric(data) & length(data) > 1)) 
+        stop("data must be a numeric vector of length greater than 1")
+    if (is.null(weights)) {
+        loglik <- function(par, fix.arg, obs, ddistnam) sum(log(do.call(ddistnam, 
+            c(list(obs), as.list(par), as.list(fix.arg)))))
+    }
+    else {
+        loglik <- function(par, fix.arg, obs, ddistnam) sum(weights * 
+            log(do.call(ddistnam, c(list(obs), as.list(par), 
+                as.list(fix.arg)))))
+    }
+    if (meth == "closed formula") {
+        n <- length(data)
+        if (is.null(weights)) {
+            m <- mean(data)
+            v <- (n - 1)/n * var(data)
+        }
+        else {
+            m <- wtd.mean(data, weights = weights)
+            v <- wtd.var(data, weights = weights)
+        }
+        if (!is.null(fix.arg)) 
+            stop("argument fix.arg cannot be used when a closed formula is used.")
+        if (!(is.vector(data) & is.numeric(data) & length(data) > 
+            1)) 
+            stop("data must be a numeric vector of length greater than 1")
+        if (distname == "norm") {
+            estimate <- c(mean = m, sd = sqrt(v))
+            order <- 1:2
+        }
+        if (distname == "lnorm") {
+            if (any(data <= 0)) 
+                stop("values must be positive to fit a lognormal distribution")
+            sd2 <- log(1 + v/m^2)
+            estimate <- c(meanlog = log(m) - sd2/2, sdlog = sqrt(sd2))
+            order <- 1:2
+        }
+        if (distname == "pois") {
+            estimate <- c(lambda = m)
+            order <- 1
+        }
+        if (distname == "exp") {
+            estimate <- c(rate = 1/m)
+            order <- 1
+        }
+        if (distname == "gamma") {
+            shape <- m^2/v
+            rate <- m/v
+            estimate <- c(shape = shape, rate = rate)
+            order <- 1:2
+        }
+        if (distname == "nbinom") {
+            size <- if (v > m) 
+                m^2/(v - m)
+            else NaN
+            estimate <- c(size = size, mu = m)
+            order <- 1:2
+        }
+        if (distname == "geom") {
+            prob <- if (m > 0) 
+                1/(1 + m)
+            else NaN
+            estimate <- c(prob = prob)
+            order <- 1
+        }
+        if (distname == "beta") {
+            if (any(data < 0) | any(data > 1)) 
+                stop("values must be in [0-1] to fit a beta distribution")
+            aux <- m * (1 - m)/v - 1
+            shape1 <- m * aux
+            shape2 <- (1 - m) * aux
+            estimate <- c(shape1 = shape1, shape2 = shape2)
+            order <- 1:2
+        }
+        if (distname == "unif") {
+            min1 <- m - sqrt(3 * v)
+            max1 <- m + sqrt(3 * v)
+            estimate <- c(min1, max1)
+            order <- 1:2
+        }
+        if (distname == "logis") {
+            scale <- sqrt(3 * v)/pi
+            estimate <- c(location = m, scale = scale)
+            order <- 1:2
+        }
+        if (exists(ddistname)) 
+            loglikval <- loglik(estimate, fix.arg, data, ddistname)
+        else loglikval <- NULL
+        res <- list(estimate = estimate, convergence = 0, value = NULL, 
+            hessian = NULL, optim.function = NULL, opt.meth = NULL, 
+            fix.arg = NULL, fix.arg.fun = NULL, weights = weights, 
+            counts = NULL, optim.message = NULL, loglik = loglikval, 
+            method = meth, order = order, memp = NULL)
+    }
+    else {
+        if (is.vector(start)) 
+            start <- as.list(start)
+        if (!checkstartfix) {
+            cat("checkstartfix is carried out\n")
+            arg_startfix <- manageparam(start.arg = start, fix.arg = fix.arg, 
+                obs = data, distname = distname)
+            hasnodefaultval <- sapply(formals(ddistname), is.name)
+            arg_startfix <- checkparamlist(arg_startfix$start.arg, 
+                arg_startfix$fix.arg, argddistname, hasnodefaultval)
+            if (is.function(fix.arg)) 
+                fix.arg.fun <- fix.arg
+            else fix.arg.fun <- NULL
+        }
+        else {
+            arg_startfix <- list(start.arg = start, fix.arg = fix.arg)
+            fix.arg.fun <- NULL
+        }
+        vstart <- unlist(arg_startfix$start.arg)
+        if (is.null(vstart)) 
+            stop("Starting values could not be NULL with checkstartfix=TRUE")
+        fix.arg <- arg_startfix$fix.arg
+        if (length(vstart) != length(order)) 
+            stop("wrong dimension for the moment order to match")
+        if (missing(memp)) 
+            stop("the empirical moment function must be defined")
+        if (is.character(memp)) 
+            memp <- get0(memp, envir = pos.to.env(1))
+        if (!is.function(memp)) 
+            stop("the empirical moment must be defined as a function")
+        if (is.null(weights)) {
+            txt <- "the empirical moment function must be a two-argument function of 'x', 'order'"
+            if (length(formals(memp)) != 2) 
+                stop(txt)
+            if (any(names(formals(memp)) != c("x", "order"))) 
+                stop(txt)
+        }
+        else {
+            txt <- "the empirical moment function must be a three-argument function of 'x', 'order', 'weights'"
+            if (length(formals(memp)) != 3) 
+                stop(txt)
+            if (any(names(formals(memp)) != c("x", "order", "weights"))) 
+                stop(txt)
+        }
+        if (is.null(weights)) {
+            DIFF2 <- function(par, fix.arg, order, obs, mdistnam, 
+                memp, weights) {
+                momtheo <- do.call(mdistnam, c(as.list(order), 
+                  as.list(par), as.list(fix.arg)))
+                momemp <- as.numeric(memp(obs, order))
+                (momemp - momtheo)^2
+            }
+            fnobj <- function(par, fix.arg, obs, mdistnam, memp, 
+                weights) sum(sapply(order, function(o) DIFF2(par, 
+                fix.arg, o, obs, mdistnam, memp)))
+        }
+        else {
+            DIFF2 <- function(par, fix.arg, order, obs, mdistnam, 
+                memp, weights) {
+                momtheo <- do.call(mdistnam, c(as.list(order), 
+                  as.list(par), as.list(fix.arg)))
+                momemp <- as.numeric(memp(obs, order, weights))
+                (momemp - momtheo)^2
+            }
+            fnobj <- function(par, fix.arg, obs, mdistnam, memp, 
+                weights) sum(sapply(order, function(o) DIFF2(par, 
+                fix.arg, o, obs, mdistnam, memp, weights)))
+        }
+        cens <- FALSE
+        if (cens) 
+            stop("Moment matching estimation for censored data is not yet available.")
+        owarn <- getOption("warn")
+        if (is.null(custom.optim)) {
+            hasbound <- any(is.finite(lower) | is.finite(upper))
+            if (optim.method == "default") {
+                opt.meth <- ifelse(length(vstart) > 1, "Nelder-Mead", 
+                  "BFGS")
+            }
+            else opt.meth <- optim.method
+            if (opt.meth == "BFGS" && hasbound && is.null(gradient)) {
+                opt.meth <- "L-BFGS-B"
+                txt1 <- "The BFGS method cannot be used with bounds without provided the gradient."
+                txt2 <- "The method is changed to L-BFGS-B."
+                warning(paste(txt1, txt2))
+            }
+            options(warn = ifelse(silent, -1, 0))
+            if (hasbound) {
+                if (!is.null(gradient)) {
+                  opt.fun <- "constrOptim"
+                }
+                else {
+                  if (opt.meth == "Nelder-Mead") 
+                    opt.fun <- "constrOptim"
+                  else if (opt.meth %in% c("L-BFGS-B", "Brent")) 
+                    opt.fun <- "optim"
+                  else {
+                    txt1 <- paste("The method", opt.meth, "cannot be used by constrOptim() nor optim() without gradient and bounds.")
+                    txt2 <- "Only optimization methods L-BFGS-B, Brent and Nelder-Mead can be used in such case."
+                    stop(paste(txt1, txt2))
+                  }
+                }
+                if (opt.fun == "constrOptim") {
+                  npar <- length(vstart)
+                  lower <- as.double(rep_len(lower, npar))
+                  upper <- as.double(rep_len(upper, npar))
+                  haslow <- is.finite(lower)
+                  Mat <- diag(npar)[haslow, ]
+                  hasupp <- is.finite(upper)
+                  Mat <- rbind(Mat, -diag(npar)[hasupp, ])
+                  colnames(Mat) <- names(vstart)
+                  rownames(Mat) <- paste0("constr", 1:NROW(Mat))
+                  Bnd <- c(lower[is.finite(lower)], -upper[is.finite(upper)])
+                  names(Bnd) <- paste0("constr", 1:length(Bnd))
+                  initconstr <- Mat %*% vstart - Bnd
+                  if (any(initconstr < 0)) 
+                    stop("Starting values must be in the feasible region.")
+                  opttryerror <- try(opt <- constrOptim(theta = vstart, 
+                    f = fnobj, ui = Mat, ci = Bnd, grad = gradient, 
+                    fix.arg = fix.arg, obs = data, mdistnam = mdistname, 
+                    memp = memp, hessian = !is.null(gradient), 
+                    method = opt.meth, weights = weights, ...), 
+                    silent = TRUE)
+                  if (!inherits(opttryerror, "try-error")) 
+                    if (length(opt$counts) == 1) 
+                      opt$counts <- c(opt$counts, NA)
+                }
+                else {
+                  opttryerror <- try(opt <- optim(par = vstart, 
+                    fn = fnobj, fix.arg = fix.arg, obs = data, 
+                    gr = gradient, mdistnam = mdistname, memp = memp, 
+                    hessian = TRUE, method = opt.meth, lower = lower, 
+                    upper = upper, weights = weights, ...), silent = TRUE)
+                }
+            }
+            else {
+                opt.fun <- "optim"
+                opttryerror <- try(opt <- optim(par = vstart, 
+                  fn = fnobj, fix.arg = fix.arg, obs = data, 
+                  gr = gradient, mdistnam = mdistname, memp = memp, 
+                  hessian = TRUE, method = opt.meth, lower = lower, 
+                  upper = upper, ...), silent = TRUE)
+            }
+            options(warn = owarn)
+            if (inherits(opttryerror, "try-error")) {
+                warnings("The function optim encountered an error and stopped.")
+                if (getOption("show.error.messages")) 
+                  print(attr(opttryerror, "condition"))
+                return(list(estimate = rep(NA, length(vstart)), 
+                  convergence = 100, value = NA, hessian = NA))
+            }
+            if (opt$convergence > 0) {
+                warnings("The function optim failed to converge, with the error code ", 
+                  opt$convergence)
+            }
+            if (is.null(names(opt$par))) 
+                names(opt$par) <- names(vstart)
+            res <- list(estimate = opt$par, convergence = opt$convergence, 
+                value = opt$value, hessian = opt$hessian, optim.function = opt.fun, 
+                optim.method = opt.meth, fix.arg = fix.arg, fix.arg.fun = fix.arg.fun, 
+                weights = weights, counts = opt$counts, optim.message = opt$message, 
+                loglik = ifelse(exists(ddistname), loglik(opt$par, 
+                  fix.arg, data, ddistname), NULL), method = meth, 
+                order = order, memp = memp)
+        }
+        else {
+            opt.meth <- NULL
+            if (!cens) {
+                options(warn = ifelse(silent, -1, 0))
+                opttryerror <- try(opt <- custom.optim(fn = fnobj, 
+                  fix.arg = fix.arg, obs = data, mdistnam = mdistname, 
+                  memp = memp, par = vstart, weights = weights, 
+                  ...), silent = TRUE)
+                options(warn = owarn)
+            }
+            else stop("Moment matching estimation for censored data is not yet available.")
+            if (inherits(opttryerror, "try-error")) {
+                warnings("The customized optimization function encountered an error and stopped.")
+                if (getOption("show.error.messages")) 
+                  print(attr(opttryerror, "condition"))
+                return(list(estimate = rep(NA, length(vstart)), 
+                  convergence = 100, value = NA, hessian = NA))
+            }
+            if (opt$convergence > 0) {
+                warnings("The customized optimization function failed to converge, with the error code ", 
+                  opt$convergence)
+            }
+            if (is.null(names(opt$par))) 
+                names(opt$par) <- names(vstart)
+            argdot <- list(...)
+            method.cust <- argdot$method
+            res <- list(estimate = opt$par, convergence = opt$convergence, 
+                value = opt$value, hessian = opt$hessian, optim.function = custom.optim, 
+                optim.method = method.cust, fix.arg = fix.arg, 
+                fix.arg.fun = fix.arg.fun, weights = weights, 
+                counts = opt$counts, optim.message = opt$message, 
+                loglik = ifelse(exists(ddistname), loglik(opt$par, 
+                  fix.arg, data, ddistname), NULL), method = meth, 
+                order = order, memp = memp)
+        }
+    }
+    return(res)
 }
-
-frecuencias.R <- F.Frecuencias(defraudaciones, "R")[1:6]
-# frecuencias.D <- F.Frecuencias(defraudaciones, "D")
-
-
-chisq.test(frecuencias.R)
-# chisq.test(frecuencias.O)
-
 ```
 
 
 ```{r}
-frecuencias.R
-# frecuencias.D
+# recl1 <- log(defraudaciones$MontoHistorico)
+# recl2 <- defraudaciones$MontoHistorico
+# 
+# res1 <- fit.cont(data2fit=diasTn)
+# 
+# 
+# # fitdist(log((defraudaciones$MontoHistorico), "pareto")
+# # fitdist(defraudaciones$MontoHistorico, "pareto")
+# # fitdist(((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico), "pareto")
+# # hist(recl1)
+# # hist(recl2)
+# 
+# hist((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico)
+# hist(log((defraudaciones %>% filter(MontoHistorico>7000000))$MontoHistorico))
+# 
+# 
+# # 75%
+# x1 <- (defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico
+# x2 <- log((defraudaciones %>% filter(MontoHistorico>221194.94))$MontoHistorico)
+# 
+# # fit.cont(data2fit=x1)
+# # fit.cont(data2fit=x2)
+# 
+# # 99%
+# y1 <- (defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico
+# y2 <- log((defraudaciones %>% filter(MontoHistorico>3074637))$MontoHistorico)
+# 
+# # fit.cont(data2fit=y1)
+# # fit.cont(data2fit=y2)
 ```
-
-
-```{r}
-
-# x1 <- defraudaciones %>% filter(MesD==1)
-# ggplot(x1, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x1$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x1$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# 
-# x2 <- defraudaciones %>% filter(MesD==2)
-# ggplot(x2, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x2$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x2$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x3 <- defraudaciones %>% filter(MesD==3)
-# ggplot(x3, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x3$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x3$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x4 <- defraudaciones %>% filter(MesD==4)
-# ggplot(x4, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x4$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x4$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x5 <- defraudaciones %>% filter(MesD==5)
-# ggplot(x5, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x5$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x5$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x6 <- defraudaciones %>% filter(MesD==6)
-# ggplot(x6, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x6$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x6$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x7 <- defraudaciones %>% filter(MesD==7)
-# ggplot(x7, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x7$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x7$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x8 <- defraudaciones %>% filter(MesD==8)
-# ggplot(x8, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x8$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x8$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x9 <- defraudaciones %>% filter(MesD==9)
-# ggplot(x9, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x9$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x9$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x10 <- defraudaciones %>% filter(MesD==10)
-# ggplot(x10, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x10$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x10$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x11 <- defraudaciones %>% filter(MesD==11)
-# ggplot(x11, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x11$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x11$MontoHistorico), 0.75)[[1]], color = "red")
-# 
-# x12 <- defraudaciones %>% filter(MesD==12)
-# ggplot(x12, aes(x=log(MontoHistorico))) +
-#   geom_histogram() +
-#   geom_vline(xintercept=quantile(log(x12$MontoHistorico), 0.25)[[1]], color="red") +
-#   geom_vline(xintercept=quantile(log(x12$MontoHistorico), 0.75)[[1]], color = "red")
-
-
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -263,29 +263,6 @@ fig.subplots_adjust(top=0.86)
 
 plt.show()
 
-#%%
-
-# fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
-#                                "%Y-%m-%d %H:%M:%S") ])
-# for i in range(0, len(datos.FechaDescubrimiento)):
-#     temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
-#                                "%Y-%m-%d %H:%M:%S")
-#     fechas = np.append(fechas, temp)
-
-# meses = [x.month-1 for x in fechas]
-
-#df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
-#df["BigFrec"]=df["frecuenciaO"]>30
-#observados=pd.crosstab(index=df['BigFrec'],columns=df['MontoHistorico'],margins=True)
-
-#res = stat()
-
-#res.chisq(df=datos)
-
-#Prueba chi cuadrado
-#vec=(F_frecuencias(datos,"O"))
-#chisquare(vec)
-
 
 #%%
 
@@ -403,65 +380,28 @@ plt.show()
 
 #%%
 
-mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-       "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
+# mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+#        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
 
-fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
-for i in range(1, len(datos.FechaRegistro)):
-    temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
-    fechas = np.append(fechas, temp)
+# fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
+# for i in range(1, len(datos.FechaRegistro)):
+#     temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
+#     fechas = np.append(fechas, temp)
 
-meses = [mes[x.month-1] for x in fechas]
+# meses = [mes[x.month-1] for x in fechas]
 
-
-
-#%%
-
-sns.countplot(meses)
-plt.title("Histograma de meses de registro")
-plt.xlabel('Meses')
-plt.ylabel('Conteo') 
-
-plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
 
 
 #%%
 
+# sns.countplot(meses)
+# plt.title("Histograma de meses de registro")
+# plt.xlabel('Meses')
+# plt.ylabel('Conteo') 
 
-# alpha = nivel de significancia, 0.95, 0.99...
-# parametros[0] = "normal", "pareto"...
-# parametros[1] = parametro 1
-# parametros[2] = parametros 2, ya viene como scale
-# ...
+# plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
 
-# def VaR_alpha(alpha, parametros):
-    
-#     if(parametros[0] == "gennormal"):
-#         from scipy.stats import gennorm
-#         VaR = gennorm.ppf(alpha,parametros[1],parametros[2])
-        
-#     elif(parametros[0] == "normal"):
-#         from scipy.stats import norm
-#         VaR = norm.ppf(alpha,parametros[1],parametros[2])
-    
-#     elif(parametros[0] == "gamma"):
-#         from scipy.stats import gamma
-#         VaR = gamma.ppf(alpha,parametros[1],scale=parametros[2])
-    
-#     elif(parametros[0] == "pareto"):
-#         from scipy.stats import pareto
-#         VaR = pareto.ppf(q=alpha,b=parametros[1],scale=parametros[2])
-    
-#     elif(parametros[0] == "weibull"):
-#         from scipy.stats import weibull
-#         VaR = weibull.ppf(q=alpha,b=parametros[1],scale=parametros[2])
-    
-#     else: #(parametros[0] == "lognorm"):
-#         from scipy.stats import lognorm
-#         VaR = lognorm.ppf(q=alpha,b=parametros[1],scale=parametros[2])
-        
-#     return VaR
-    
+
 
 
 #%% Pruebas KS
@@ -490,22 +430,22 @@ stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 # junio=0
 # for i in range(0, len(meses)):
 #     if(meses[i]=='enero'):
-#        enero=enero+1
+#         enero=enero+1
        
 #     elif(meses[i]=='febrero'):
-#        febrero=febrero+1
+#         febrero=febrero+1
     
 #     elif(meses[i]=='marzo'):
-#        marzo=marzo+1
+#         marzo=marzo+1
 
 #     elif(meses[i]=='abril'):
-#        abril=abril+1
+#         abril=abril+1
 
 #     elif(meses[i]=='mayo'):
-#        mayo=mayo+1
+#         mayo=mayo+1
        
 #     elif(meses[i]=='junio'):
-#        junio=junio+1
+#         junio=junio+1
 
 
 
@@ -533,7 +473,6 @@ stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 
 
 
-from datetime import datetime, timedelta
 fechas = datos.FechaRegistro
 inicio = datetime(2020,1,1)
 fin    = datetime(2020,6,30)
@@ -546,48 +485,11 @@ f = np.array(datosF.Fechas.value_counts())
 
 frecuencias = np.concatenate((f,ceros))
 
-# x = np.array([63.76094, 0.9391803])
-x = np.arange(len(frecuencias))*0+1 # Falta calcular este
-
-from statsmodels.discrete.discrete_model import NegativeBinomial, NegativeBinomialResults
-ajusteNB = NegativeBinomial(endog=frecuencias, exog=x)
-parametrosNB = ajusteNB.fit()
-parametrosNB.summary()
-ajusteNB.summary()
-
-len(f)/(len(frecuencias)+77)
-
-# y=np.ones(len(frecuencias))
-# ja = statsmodels.discrete.discrete_model.NegativeBinomial(endog=frecuencias, exog=frecuencias)
-
-# statsmodels.discrete.discrete_model.NegativeBinomial.fit(np.array(start_params=frecuencias))
-
-
-
-# dias = np.array([0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,
-#                  0,0,0,0,1,15,0,1,0,0,0,0,17,0,0,0,0,0,0,7,16,12,
-#                  0,0,0,0,6,0,1,0,0,6,0,0,1,0,0,0,12,0,9,10,18,0,0,
-#                  2,0,19,1,0,0,0,1,1,15,2,1,0,0,24,0,1,2,14,0,0,3,4,
-#                  27,0,34,0,0,0,0,0,0,0,0,0,0,0,0,1,11,0,0,0,0,1,6,
-#                  0,0,0,0,28,0,0,0,0,0,25,0,5,8,2,0,0,0,16,2,1,0,0,
-#                  0,0,31,2,14,32,0,0,4,23,4,7,2,0,0,1,22,14,0,0,0,0,
-#                  0,51,0,7,1,0,0,4,7,4,0,7,0,0,1,16,6,28,8,0,0,0,0])
-
-
-
-
-# d = Fitter(dias,distributions=['poisson','nbinom', 'geom'])
-# d.fit()
-# d.summary()
-
-
-# chisquare(f_obs=dias, f_exp=[np.mean(dias)]*len(dias))
-# chisquare(f_obs=dias)
-
-
-# d2 = Fitter(dias)
-# d2.fit()
-# d2.summary()
+n = len(frecuencias)
+m = np.mean(frecuencias)
+v = (n - 1)/n * np.var(frecuencias, ddof=1)
+size = (m**2/(v - m))*365
+p = size/(size+m)
 
 
 
