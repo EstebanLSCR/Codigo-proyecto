@@ -75,26 +75,25 @@ plt.ylabel('Densidad')
 ## Gráfico de cuantiles
 
 parametros_pareto = stats.genpareto.fit(logeados, loc = 2 )
-parametros_normal = f.fitted_param['gennorm']
-parametros_weibull = f.fitted_param['dweibull']
-parametros_gamma = f.fitted_param['gamma']
+parametros_dgamma = f.fitted_param['dgamma']
+parametros_dweibull = f.fitted_param['dweibull']
+parametros_mielke = f.fitted_param['mielke']
+parametros_burr = f.fitted_param['burr']
+parametros_hypsecant = f.fitted_param['hypsecant']
 
 fig = plt.figure(dpi = 1300)
 
-ax = fig.add_subplot(2, 2, 1)
-sm.qqplot(logeados, stats.gennorm, 
-          distargs= (parametros_normal[0],) , 
-          loc = parametros_normal[1], 
-          scale = parametros_normal[2],
+ax = fig.add_subplot(3, 2, 1)
+sm.qqplot(logeados, stats.dgamma, 
+          distargs= (parametros_dgamma[0],) , 
+          loc = parametros_dgamma[1], 
+          scale = parametros_dgamma[2],
           line = "45", ax = ax)
-ax.set_title('Normal generalizada', size = 11.0)
+ax.set_title('dgamma', size = 11.0)
 ax.set_xlabel("")
 ax.set_ylabel("")
-#ax.set_xlim([3, 20])
-#ax.set_ylim([3, 20])
 
-
-ax2 = fig.add_subplot(2, 2, 2)
+ax2 = fig.add_subplot(3, 2, 2)
 sm.qqplot(logeados, stats.genpareto, 
         distargs= (parametros_pareto[0],) , 
         loc = parametros_pareto[1], 
@@ -103,34 +102,46 @@ sm.qqplot(logeados, stats.genpareto,
 ax2.set_title('Pareto generalizada', size = 11.0)
 ax2.set_xlabel("")
 ax2.set_ylabel("")
-#ax2.set_xlim([3, 20])
-#ax2.set_ylim([3, 20])
 
-
-ax3 = fig.add_subplot(2, 2, 3)
+ax3 = fig.add_subplot(3, 2, 3)
 sm.qqplot(logeados, stats.dweibull, 
-          distargs= (parametros_weibull[0],) ,
-          loc = parametros_weibull[1], 
-          scale = parametros_weibull[2],
+          distargs= (parametros_dweibull[0],) ,
+          loc = parametros_dweibull[1], 
+          scale = parametros_dweibull[2],
           line = "45", ax = ax3)
 ax3.set_title('Weibull doble', size = 11.0)
 ax3.set_xlabel("")
 ax3.set_ylabel("")
-#ax3.set_xlim([3, 20])
-#ax3.set_ylim([3, 20])
 
-
-ax4 = fig.add_subplot(2, 2, 4)
-sm.qqplot(logeados, stats.gamma, 
-        distargs= (parametros_gamma[0],) ,
-        loc = parametros_gamma[1], 
-        scale = parametros_gamma[2],
+ax4 = fig.add_subplot(3, 2, 4)
+sm.qqplot(logeados, stats.mielke, 
+        distargs= (parametros_mielke[0],) ,
+        loc = parametros_mielke[1], 
+        scale = parametros_mielke[2],
           line = "45", ax = ax4)
-ax4.set_title('Gamma', size = 11.0)
+ax4.set_title('mielke', size = 11.0)
 ax4.set_xlabel("")
 ax4.set_ylabel("")
-#ax4.set_xlim([3, 20])
-#ax4.set_ylim([3, 20])
+
+ax4 = fig.add_subplot(3, 2, 5)
+sm.qqplot(logeados, stats.burr, 
+        distargs= (parametros_burr[0],) ,
+        loc = parametros_burr[1], 
+        scale = parametros_burr[2],
+          line = "45", ax = ax4)
+ax4.set_title('burr', size = 11.0)
+ax4.set_xlabel("")
+ax4.set_ylabel("")
+
+ax4 = fig.add_subplot(3, 2, 6)
+sm.qqplot(logeados, stats.hypsecant, 
+        distargs= (parametros_hypsecant[0],) ,
+        loc = parametros_hypsecant[1], 
+        scale = parametros_hypsecant[2],
+          line = "45", ax = ax4)
+ax4.set_title('hypsecant', size = 11.0)
+ax4.set_xlabel("")
+ax4.set_ylabel("")
 
 fig.tight_layout(pad=0.7)
 
