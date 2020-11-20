@@ -19,10 +19,10 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from fitter import Fitter
 import statsmodels.api as sm
-from datetime import datetime
-from datetime import timedelta
-from scipy.stats import chisquare
-import datetime
+from datetime import datetime, timedelta
+# from datetime import timedelta
+# from scipy.stats import chisquare
+# import datetime
 import seaborn as sns
 import locale
 
@@ -32,26 +32,15 @@ datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #Histograma
 
-plt.hist(datos['MontoHistorico'])
-plt.title("Histograma para las reclamaciones")
-plt.xlabel('Reclamos')
-plt.ylabel('Conteo') 
+# plt.hist(datos['MontoHistorico'])
+# plt.title("Histograma para las reclamaciones")
+# plt.xlabel('Reclamos')
+# plt.ylabel('Conteo') 
 
 
 #%%
 
-## Ajustando para valores con la transformación logarítmica
-
-#f.summary()
-#fit = pareto.fit(datos.MontoHistorico)
-#print(fit)
-
-
-
-
-#%%
 logeados = np.log(datos.MontoHistorico)
-
 
 f = Fitter(logeados, distributions= ['gamma', 'dweibull', 'gennorm'])
 
@@ -81,48 +70,6 @@ plt.ylabel('Densidad')
 # plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 
-#%% Frecuencias
-
-#datos['mesO']=0
-#datos['mesD']=0
-# for i in range(0,len(datos.MontoHistorico)):
-#     datos.mesO[i]=(datos.FechaOcurrencia[i]).month
-#     datos.mesR[i]=(datos.FechaRegistro[i]).month
-datos['mesO']=0
-datos['mesR']=0
-for i in range(0,len(datos.MontoHistorico)):
-    datos.mesO[i]=(datos.FechaOcurrencia[i]).month
-    datos.mesR[i]=(datos.FechaRegistro[i]).month
-
-    
-# #datos 
-# #tipo: "O", "D"
-# #...
-
-# def F_frecuencias(datos):
-#     #frec=[1,2,3,4,5,6,7,8,9,10,11,12]
-#     frecO=datos["MontoHistorico"]
-#     frecO=frecO[1:12]
-#     #frecD=[1,2,3,4,5,6,7,8,9,10,11,12]
-    
-    
-#     for i in range(1,13): 
-#             frecO[i] = len((datos>>
-#                                mask(X.mesO==i)).mesO)
-#for i in range(1,13): 
-#    frecO[i] = len((datos.mask(X.mesR==i)).mesO)
-            
-#             #frecD[i] = len((datos>>
-#                             #mask(X.mesD==i)).mesD)
-            
-#    # if(tipo=="O"):
-#    #            frec = frecO
-                
-#    # elif(tipo=="D"):
-#    #             frec = frecd
-            
-                
-#     return frecO
 
 
 #%%
@@ -271,15 +218,15 @@ plt.show()
 
 #%%
 
-fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
-                               "%Y-%m-%d %H:%M:%S") ])
+# fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
+#                                "%Y-%m-%d %H:%M:%S") ])
 
-for i in range(1, len(datos.FechaDescubrimiento)):
-    temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
-                               "%Y-%m-%d %H:%M:%S")
-    fechas = np.append(fechas, temp)
+# for i in range(1, len(datos.FechaDescubrimiento)):
+#     temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
+#                                "%Y-%m-%d %H:%M:%S")
+#     fechas = np.append(fechas, temp)
 
-meses = [x.month-1 for x in fechas]
+# meses = [x.month-1 for x in fechas]
 
 #df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
 #df["BigFrec"]=df["frecuenciaO"]>30
@@ -426,11 +373,11 @@ plt.show()
 
 #%%
 mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-       "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
+        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
 
-fechas = np.array([datetime.datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
+fechas = np.array([datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
 for i in range(1, len(datos.FechaRegistro)):
-    temp = datetime.datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
+    temp = datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
     fechas = np.append(fechas, temp)
 
 meses = [mes[x.month-1] for x in fechas]
@@ -445,178 +392,37 @@ plt.xlabel('Meses')
 plt.ylabel('Conteo') 
 
 plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
-
-
-#%%
-
-
-# alpha = nivel de significancia, 0.95, 0.99...
-# parametros[0] = "normal", "pareto"...
-# parametros[1] = parametro 1
-# parametros[2] = parametros 2, ya viene como scale
-# ...
-
-def VaR_alpha(alpha, parametros):
-    
-    if(parametros[0] == "gennormal"):
-        from scipy.stats import gennorm
-        VaR = gennorm.ppf(alpha,parametros[1],parametros[2])
-        
-    elif(parametros[0] == "normal"):
-        from scipy.stats import norm
-        VaR = norm.ppf(alpha,parametros[1],parametros[2])
-    
-    elif(parametros[0] == "gamma"):
-        from scipy.stats import gamma
-        VaR = gamma.ppf(alpha,parametros[1],scale=parametros[2])
-    
-    elif(parametros[0] == "pareto"):
-        from scipy.stats import pareto
-        VaR = pareto.ppf(q=alpha,b=parametros[1],scale=parametros[2])
-    
-    elif(parametros[0] == "weibull"):
-        from scipy.stats import weibull
-        VaR = weibull.ppf(q=alpha,b=parametros[1],scale=parametros[2])
-    
-    else: #(parametros[0] == "lognorm"):
-        from scipy.stats import lognorm
-        VaR = lognorm.ppf(q=alpha,b=parametros[1],scale=parametros[2])
-        
-    return VaR
-    
-
             
-
-
-#%% Pruebas KS
-
-stats.kstest(logeados, "genpareto", args=(parametros_pareto))
-stats.kstest(logeados, "gennorm", args=(parametros_normal))
-stats.kstest(logeados, "gamma", args=(parametros_gamma))
-stats.kstest(logeados, "dweibull", args=(parametros_weibull))
-
-    
-stats.kstest(logeados2, "genpareto", args=(parametros_pareto2))
-stats.kstest(logeados2, "gennorm", args=(parametros_normal2))
-stats.kstest(logeados2, "gamma", args=(parametros_gamma2))
-stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
-
-
-
 
 #%% Frecuencias
 
-enero=0
-febrero=0
-marzo=0
-abril=0
-mayo=0
-junio=0
-for i in range(0, len(meses)):
-    if(meses[i]=='enero'):
-       enero=enero+1
-       
-    elif(meses[i]=='febrero'):
-       febrero=febrero+1
-    
-    elif(meses[i]=='marzo'):
-       marzo=marzo+1
+fechas = datos.FechaRegistro
+inicio = datetime(2020,1,1)
+fin    = datetime(2020,6,30)
 
-    elif(meses[i]=='abril'):
-       abril=abril+1
+datosF = pd.DataFrame({'Fechas' : datos.FechaRegistro})
 
-    elif(meses[i]=='mayo'):
-       mayo=mayo+1
-       
-    elif(meses[i]=='junio'):
-       junio=junio+1
+ceros = np.arange((fin - inicio).days + 1 - datosF.nunique(0).Fechas)*0
 
+f = np.array(datosF.Fechas.value_counts())
 
+frecuencias = np.concatenate((f,ceros))
 
-meses2 = [enero,febrero,marzo,abril,mayo,junio]
-# meses2
+n = len(frecuencias)
+m = np.mean(frecuencias)
+v = (n - 1)/n * np.var(frecuencias, ddof=1)
+size = (m**2/(v - m))*365
+p = size/(size+m)
 
-# np.mean(meses2)
-# np.var(meses2)
-
-# chisquare(f_obs=meses2, f_exp=[np.mean(meses2)]*len(meses2))
-
-
-
-
-# m2 = Fitter(meses2,distributions=['poisson','nbinom'])
-# m2.fit()
-
-# parametros_poisson = meses2.fitted_param['poisson']
-# m2.summary()
-
-
-
-
-
-dias = [0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,
-        0,0,0,0,1,15,0,1,0,0,0,0,17,0,0,0,0,0,0,7,16,12,
-        0,0,0,0,6,0,1,0,0,6,0,0,1,0,0,0,12,0,9,10,18,0,0,
-        2,0,19,1,0,0,0,1,1,15,2,1,0,0,24,0,1,2,14,0,0,3,4,
-        27,0,34,0,0,0,0,0,0,0,0,0,0,0,0,1,11,0,0,0,0,1,6,
-        0,0,0,0,28,0,0,0,0,0,25,0,5,8,2,0,0,0,16,2,1,0,0,
-        0,0,31,2,14,32,0,0,4,23,4,7,2,0,0,1,22,14,0,0,0,0,
-        0,51,0,7,1,0,0,4,7,4,0,7,0,0,1,16,6,28,8,0,0,0,0]
-
-
-
-d = Fitter(dias,distributions=['poisson','nbinom', 'geom'])
-d.fit()
-d.summary()
-
-
-chisquare(f_obs=dias, f_exp=[np.mean(dias)]*len(dias))
-chisquare(f_obs=dias)
-
-
-d2 = Fitter(dias)
-d2.fit()
-d2.summary()
-
-m3 = Fitter(meses2)
-m3.fit()
-m3.summary()
-
-# fig = plt.figure(dpi = 1300)
-
-# ax = fig.add_subplot(1, 1, 1)
-# sm.qqplot(logeados, stats.poisson, 
-#           distargs= (parametros_poisson[0],) , 
-#           loc = parametros_normal2[1], 
-#           scale = parametros_normal2[2],
-#           line = "45", ax = ax)
-# ax.set_title('Poisson', size = 11.0)
-# ax.set_xlabel("")
-# ax.set_ylabel("")
-# #ax.set_xlim([12, 17])
-# #ax.set_ylim([12, 17])
-
-
-
-# fig.tight_layout(pad=0.7)
-
-# fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
-# fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
-
-# fig.suptitle('Gráfico de cuantiles distribución para la frecuencia')
-# fig.subplots_adjust(top=0.86)
-
-# plt.show()
 
 
 #%% Conteo de reclamos por día
 
+rango_fechas = pd.date_range(datos['FechaRegistro'][0] - timedelta(days = 1), 
+        end = datos['FechaRegistro'].max() + timedelta(days = 4) ).to_pydatetime().tolist()
 
-rango_fechas = pd.date_range(datos['FechaRegistro'][0] - datetime.timedelta(days = 1), 
-        end = datos['FechaRegistro'].max() + datetime.timedelta(days = 4) ).to_pydatetime().tolist()
 
-
-fechas_vistas = np.array([datetime.datetime.strptime(str(x), 
+fechas_vistas = np.array([datetime.strptime(str(x), 
                     "%Y-%m-%d %H:%M:%S") for x in datos.FechaRegistro ])
 
 
@@ -645,6 +451,7 @@ prob = size/(size + mu)
 q =  np.linspace(0.01,0.99,182)
 cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
 cuantil_observado = np.quantile(conteo_dias, q)
+
 
 
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
@@ -697,6 +504,67 @@ plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
 plt.show()
 
 #%%
+
+## Parámetros obtenidos en R para la geometrica
+p = 0.1948608
+
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.geom.ppf(q , p)
+cuantil_observado = np.quantile(conteo_dias, q)
+
+
+
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+
+ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
+ax1.plot([0, 50], [0, 50], color = "red")
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
+
+
+cdf_teorico = stats.geom.cdf(cuantil_teorico, p = p)
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+         color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
+
+
+pp_plot(conteo_dias , stats.geom(p=p) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
+       
+
+densidad_teorica = stats.geom.pmf(np.unique(conteo_dias), p = p)
+
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+         label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+         label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
+
+fig.suptitle("Ajuste geométrica", fontsize=14)
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
+
+plt.savefig('Frecuencias_geometrica.jpeg', format='jpeg', dpi=1300)
+
+plt.show()
+
+#%%
+
+
 
 ## Parámetros obtenidos para la poisson
 lamb = np.mean(conteo_dias)
@@ -776,7 +644,7 @@ parametros_pareto2 =  f2.fitted_param['genpareto']
 
 # m: numero de simulaciones
 m = 10000
-# Umbral para teoría del valor extremo
+    # Umbral para teoría del valor extremo
 q = 0.95
 # parámetros binomial negativa
 
@@ -841,6 +709,7 @@ for j in range(0,m):
     totales[j] = sum(Reclamaciones)
 
 #%%
+logeados
 
 #Media
 locale.format_string("%d", np.mean(totales) , grouping=True)
@@ -861,6 +730,9 @@ plt.hist(np.log(totales))
 plt.title("Histograma de los totales simulados")
 plt.xlabel('Logaritmo de los totales')
 plt.ylabel('Conteo') 
+
+
+plt.savefig('hist_de los totales simulados.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
@@ -1012,3 +884,19 @@ plt.ylabel("CDF", fontsize=8)
 plt.legend()
 
 plt.show()
+
+
+
+ #%% Pruebas KS
+
+stats.kstest(logeados, "genpareto", args=(parametros_pareto))
+stats.kstest(logeados, "gennorm", args=(parametros_normal))
+stats.kstest(logeados, "gamma", args=(parametros_gamma))
+stats.kstest(logeados, "dweibull", args=(parametros_weibull))
+
+    
+stats.kstest(logeados2, "genpareto", args=(parametros_pareto2))
+stats.kstest(logeados2, "gennorm", args=(parametros_normal2))
+stats.kstest(logeados2, "gamma", args=(parametros_gamma2))
+stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
+
