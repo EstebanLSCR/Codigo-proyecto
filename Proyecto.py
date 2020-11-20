@@ -245,7 +245,10 @@ plt.show()
 
 #Corte para valor extremo
 
-logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+#logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+#logeados2 = np.exp(logeados2)
+logeados2 = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
+
 
 f2 = Fitter(logeados2,  
            distributions= ['gamma', 'dweibull',
@@ -257,43 +260,56 @@ plt.xlabel('Mes')
 plt.ylabel('Conteo') 
 
 
-parametros_pareto2 = stats.genpareto.fit(logeados2, loc = 15 )
+#parametros_pareto2 = stats.genpareto.fit(logeados2, loc = np.exp(15) )
 
-f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
-                c = parametros_pareto2[0], 
-                loc = parametros_pareto2[1], 
-                scale = parametros_pareto2[2])
+#f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
+ #               c = parametros_pareto2[0], 
+  #              loc = parametros_pareto2[1], 
+   #             scale = parametros_pareto2[2])
 
 parametros_normal2 = f2.fitted_param['gennorm']
 parametros_weibull2 = f2.fitted_param['dweibull']
 parametros_gamma2 = f2.fitted_param['gamma']
+#parametros_pareto2 = f2.fitted_param['genpareto']
 
 f2.summary()
-plt.plot(np.sort(logeados2), f_pareto, color = "purple", label = "genpareto")
-plt.legend()
+#plt.plot(np.sort(logeados2), f_pareto, color = "purple", label = "genpareto")
+#plt.legend()
 
 
 plt.title("Ajuste de densidades para la cola de las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
 
-plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
+#plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
 #%%
 
+#logeados2 = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
+logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+
+parametros_pareto2 = stats.genpareto.fit(logeados2, loc = 15)
+parametros_gamma2 =  stats.gamma.fit(logeados2)
+
+parametros_genextrme = stats.genextreme.fit(logeados2)
+
+
+
+#%%
+
 ## Gráfico de cuantiles cola
 
-fig = plt.figure(dpi = 1300)
+fig = plt.figure()
 
 ax = fig.add_subplot(2, 2, 1)
-sm.qqplot(logeados2, stats.gennorm, 
-          distargs= (parametros_normal2[0],) , 
-          loc = parametros_normal2[1], 
-          scale = parametros_normal2[2],
+sm.qqplot(logeados2, stats.genextreme, 
+          distargs= (parametros_genextrme[0],) , 
+          loc = parametros_genextrme[1], 
+          scale = parametros_genextrme[2],
           line = "45", ax = ax)
-ax.set_title('Normal generalizada', size = 11.0)
+ax.set_title('Extrema generalizada', size = 11.0)
 ax.set_xlabel("")
 ax.set_ylabel("")
 #ax.set_xlim([12, 17])
@@ -301,16 +317,15 @@ ax.set_ylabel("")
 
 
 ax2 = fig.add_subplot(2, 2, 2)
-sm.qqplot(logeados2, stats.genpareto, 
-        distargs= (parametros_pareto2[0],) , 
-        loc = parametros_pareto2[1], 
-        scale = parametros_pareto2[2],
+sm.qqplot(logeados2, stats.genpareto(c =parametros_pareto2[0],
+                                     loc = parametros_pareto2[1],
+                                     scale = parametros_pareto2[2]), 
           line = "45",ax = ax2)
 ax2.set_title("Pareto generalizada", size = 11.0)
 ax2.set_xlabel("")
 ax2.set_ylabel("")
 #ax2.set_xlim([12, 20])
-#ax2.set_ylim([12, 20])
+#ax2.set_ylim([-0.1e10, 2e10])
 
 
 ax3 = fig.add_subplot(2, 2, 3)
@@ -347,6 +362,14 @@ fig.suptitle('Gráfico de cuantiles distribuciones para las colas')
 fig.subplots_adjust(top=0.86)
 
 plt.show()
+
+
+
+#%% Gráficos ajuste cola
+
+
+
+
 
 #%%
 mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -433,8 +456,10 @@ cuantil_observado = np.quantile(conteo_dias, q)
 
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
-ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
-ax1.plot([0, 50], [0, 50], color = "red")
+
+sm.qqplot(conteo_dias, stats.nbinom(n = size, p = prob),
+          loc = 0, scale = 1,
+          line = "45", ax = ax1)
 ax1.set_title("Cuantiles", fontsize=11)
 ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
 ax1.set_ylabel("Cuantiles observados", fontsize=8)
@@ -607,7 +632,8 @@ plt.show()
 #%%
 
 logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-f2 = Fitter(np.exp(logeados2),  distributions= 'genpareto')
+datos_sampleo = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
+f2 = Fitter(datos_sampleo,  distributions= 'genpareto')
 f2.fit()
 parametros_pareto2 =  f2.fitted_param['genpareto']
 
@@ -637,8 +663,8 @@ def sampleo_distr_empirica(n):
     n = tamaño del sampleo
     '''
     uniformes = np.random.uniform(size = n)
-    sampleo = np.quantile(np.exp(logeados[logeados < np.quantile(logeados, q)]), 
-                          uniformes)
+    datos_sampleo = datos.MontoHistorico[datos.MontoHistorico < np.quantile(datos.MontoHistorico, q)]
+    sampleo = np.quantile(datos_sampleo,uniformes)
     return sampleo
     
 
@@ -656,6 +682,8 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
 
 #maximos = np.zeros(m) 
 #no_empiricas = np.zeros(m) 
+li_recla = list()
+
 for j in range(0,m):
     # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
     Uniformes = np.random.uniform(size = Frecuencias[j])
@@ -671,6 +699,8 @@ for j in range(0,m):
     Reclamaciones[~ empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
                         loc = parametros_pareto2[1], scale = parametros_pareto2[2],
                         size = sum(Uniformes > q))
+    
+    li_recla.append(Reclamaciones)
     #maximos[j] = max(Reclamaciones)
     #no_empiricas[j] = sum(Uniformes > q)
     
@@ -706,7 +736,154 @@ plt.savefig('hist_de los totales simulados.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
+#%%
 
+
+
+parametros_lognormal = stats.gennorm.fit(logeados)
+
+
+sm.qqplot(logeados, stats.gennorm, 
+          distargs= (parametros_lognormal[0],) , 
+          loc = parametros_lognormal[1], 
+          scale = parametros_lognormal[2],
+          line = "45")
+
+
+#%%
+
+# m: numero de simulaciones
+m = 10000
+# parámetros binomial negativa
+
+mu = 4.129051
+size = 0.174687
+prob = size/(size + mu)
+#size = 0.2730495
+size = size*365
+
+parametros_nbinom = np.array([size,prob])
+
+
+# vector de totales
+totales = np.zeros(m) 
+
+# Simulaciones
+# Se fija la semilla para obtener replicar los resultados 
+np.random.seed(100)
+
+# Genere vector de variables N_1 , ... , N_m
+Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
+                               p = parametros_nbinom[1],
+                               loc = 0, size = m)
+
+#maximos = np.zeros(m) 
+#no_empiricas = np.zeros(m) 
+li_recla = list()
+
+for j in range(0,m):
+    # Vector de reclamaciones
+    
+    Reclamaciones = stats.gennorm.rvs(beta = parametros_lognormal[0],
+                        loc = parametros_lognormal[1], 
+                        scale = parametros_lognormal[2],
+                        size = Frecuencias[j] )
+    #maximos[j] = max(Reclamaciones)
+    #no_empiricas[j] = sum(Uniformes > q)
+    li_recla.append(Reclamaciones)
+    # Se guardan la suma de las reclamaciones
+    # Elimina el efecto de los logarítmos
+    totales[j] = sum(np.exp(Reclamaciones))
+
+
+#%%
+#from rpy2.robjects.packages import importr
+# import R's "base" package
+
+import rpy2.robjects.packages as rpackages
+
+# import R's utility package
+utils = rpackages.importr('utils')
+
+# select a mirror for R packages
+utils.chooseCRANmirror(ind=1)
+
+packnames = ('fitdistrplus', 'MASS')
+
+# R vector of strings
+from rpy2.robjects.vectors import StrVector
+
+# Selectively install what needs to be install.
+# We are fancy, just because we can.
+names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
+if len(names_to_install) > 0:
+    utils.install_packages(StrVector(names_to_install))
+
+
+#%%
+import rpy2.robjects as robjects
+from rpy2.robjects.packages import importr
+# import R's "base" package
+fitdistrplus = importr('fitdistrplus')
+MASS = importr('MASS')
+Stats = importr('stats')
+
+ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(conteo_dias),
+                                     "nbinom", "mle")
+
+
+
+
+
+#%%
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_observado = np.quantile(np.exp(logeados), q)
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+for j in range(0, len(li_recla)):
+    cuantil_observado2 = np.quantile(li_recla[j] ,q)
+    ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
+
+    plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
+         color = "red")
+
+
+plt.plot(cuantil_observado, ecdf(cuantil_observado),
+         color = "blue", label = "CDF observado")
+
+plt.title("Distribución acumulada", fontsize=11)
+plt.xlabel('Datos', fontsize=8)
+plt.ylabel("CDF", fontsize=8)
+plt.legend()
+
+plt.show()
+
+
+#%%
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_observado = np.quantile(logeados, q)
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+
+for j in range(0, len(li_recla)):
+    cuantil_observado2 = np.quantile(li_recla[j] ,q)
+    ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
+
+    plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
+         color = "red")
+
+
+plt.plot(cuantil_observado, ecdf(cuantil_observado),
+         color = "blue", label = "CDF observado")
+
+plt.title("Distribución acumulada", fontsize=11)
+plt.xlabel('Datos', fontsize=8)
+plt.ylabel("CDF", fontsize=8)
+plt.legend()
+
+plt.show()
 
 
 
@@ -722,8 +899,4 @@ stats.kstest(logeados2, "genpareto", args=(parametros_pareto2))
 stats.kstest(logeados2, "gennorm", args=(parametros_normal2))
 stats.kstest(logeados2, "gamma", args=(parametros_gamma2))
 stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
-
-
-
-
 

@@ -67,26 +67,44 @@ prob = size/(size+mu)
 size = size*365
 
 
-# Parámetros binomial negativa usando MLE
-import rpy2
+# Código para instalar y correr paquetes de R: fitdistrplus y MASS
+
+import rpy2.robjects.packages as rpackages
+
+# import R's utility package
+utils = rpackages.importr('utils')
+
+# select a mirror for R packages
+utils.chooseCRANmirror(ind=1)
+
+packnames = ('fitdistrplus', 'MASS')
+
+# paquete para crear strings en R
+from rpy2.robjects.vectors import StrVector
+
+# Instala paquetes que no estén instalados
+names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
+if len(names_to_install) > 0:
+    utils.install_packages(StrVector(names_to_install))
+
+# paquetes para importar y crear vectores
 import rpy2.robjects as robjects
-from rpy2.robjects import r
 from rpy2.robjects.packages import importr
+# import R's "base" package
 fitdistrplus = importr('fitdistrplus')
+MASS = importr('MASS')
+Stats = importr('stats')
 
-r('''
-  
-  # F.nbinom <- fitdist(diasTn, "nbinom", method="mle")
-  ''')
+ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(frecuencias),
+                                     "nbinom", "mle")
 
-# mu = 4.129051
-# size = 0.174687
-# prob = size/(size + mu)
-# size = size*365
+# Parámetros binomial negativa mle
+size = ajuste_nbinom[0][0]
+mu = ajuste_nbinom[0][1]
+prob = size/(size + mu)
+size = size*365
 
 parametros_nbinom = np.array([size,prob])
-
-
 
 
 # Función para sampleo de la distribución empírica
