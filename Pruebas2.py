@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 19 20:28:32 2020
+Created on Fri Nov 20 06:07:27 2020
 
 @author: marcoantoniomejiaelizondo
 """
-
 
 # Código proyecto de riesgo
 
@@ -19,14 +18,16 @@ import matplotlib.pyplot as plt
 from fitter import Fitter
 import statsmodels.api as sm
 from datetime import datetime, timedelta
-datetime
 import seaborn as sns
+
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #%%
 
-datos = datos[datos.TipoEvento=="Tarjetas de débito"]
+datos = datos[datos.TipoEvento!="Tarjetas de crédito"]
+# datos = datos[datos.TipoEvento=="Incidentes cuenta 147"]
+
 
 #Histograma
 
@@ -737,10 +738,5 @@ ES_mme =  np.mean(totales[totales > VaR_mme])
 # ES_mle
 # np.mean(Frecuencias)
 # np.mean(totales)
-
-
-
-
-
 
 

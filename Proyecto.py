@@ -92,8 +92,6 @@ sm.qqplot(logeados, stats.gennorm,
 ax.set_title('Normal generalizada', size = 11.0)
 ax.set_xlabel("")
 ax.set_ylabel("")
-#ax.set_xlim([3, 20])
-#ax.set_ylim([3, 20])
 
 
 ax2 = fig.add_subplot(2, 2, 2)
@@ -105,8 +103,6 @@ sm.qqplot(logeados, stats.genpareto,
 ax2.set_title('Pareto generalizada', size = 11.0)
 ax2.set_xlabel("")
 ax2.set_ylabel("")
-#ax2.set_xlim([3, 20])
-#ax2.set_ylim([3, 20])
 
 
 ax3 = fig.add_subplot(2, 2, 3)
@@ -118,8 +114,6 @@ sm.qqplot(logeados, stats.dweibull,
 ax3.set_title('Weibull doble', size = 11.0)
 ax3.set_xlabel("")
 ax3.set_ylabel("")
-#ax3.set_xlim([3, 20])
-#ax3.set_ylim([3, 20])
 
 
 ax4 = fig.add_subplot(2, 2, 4)
@@ -131,8 +125,6 @@ sm.qqplot(logeados, stats.gamma,
 ax4.set_title('Gamma', size = 11.0)
 ax4.set_xlabel("")
 ax4.set_ylabel("")
-#ax4.set_xlim([3, 20])
-#ax4.set_ylim([3, 20])
 
 fig.tight_layout(pad=0.7)
 
@@ -245,9 +237,9 @@ plt.show()
 
 #Corte para valor extremo
 
-#logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-#logeados2 = np.exp(logeados2)
-logeados2 = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
+logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+# logeados2 = np.exp(logeados2)
+# logeados2 = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
 
 
 f2 = Fitter(logeados2,  
@@ -441,6 +433,129 @@ plt.xlabel('Número de reclamos')
 plt.ylabel("Conteo")
 
 
+
+
+
+
+#%%
+
+## Parámetros obtenidos para la poisson
+lamb = np.mean(conteo_dias)
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.poisson.ppf(q, mu = lamb)
+cuantil_observado = np.quantile(conteo_dias, q)
+
+
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+
+ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
+ax1.plot([0, 50], [0, 50], color = "red")
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
+
+
+cdf_teorico = stats.poisson.cdf(cuantil_teorico, mu = lamb )
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+         color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
+
+pp_plot(conteo_dias , stats.poisson(mu = lamb) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
+       
+
+densidad_teorica = stats.poisson.pmf(np.unique(conteo_dias), mu = lamb)
+
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+         label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+         label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
+
+
+fig.suptitle("Ajuste Poisson", fontsize=14)
+
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
+
+plt.savefig('Frecuencias_poisson.jpeg', format='jpeg', dpi=1300)
+
+plt.show()
+
+
+#%%
+
+## Parámetros obtenidos en R para la geometrica
+p = 1/(1 + np.mean(conteo_dias))
+
+
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.geom.ppf(q , p)
+cuantil_observado = np.quantile(conteo_dias, q)
+
+
+
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+
+ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
+ax1.plot([0, 50], [0, 50], color = "red")
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
+
+
+cdf_teorico = stats.geom.cdf(cuantil_teorico, p = p)
+ecdf = sm.distributions.ECDF(cuantil_observado)
+
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+         color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
+
+
+pp_plot(conteo_dias , stats.geom(p=p) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
+       
+
+densidad_teorica = stats.geom.pmf(np.unique(conteo_dias), p = p)
+
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+         label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+         label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
+
+fig.suptitle("Ajuste geométrica", fontsize=14)
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
+
+plt.savefig('Frecuencias_geometrica.jpeg', format='jpeg', dpi=1300)
+
+plt.show()
+
+
 #%%
 
 ## Parámetros obtenidos en R para la binomial negativa
@@ -503,131 +618,6 @@ plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
-#%%
-
-## Parámetros obtenidos en R para la geometrica
-p = 0.1948608
-
-
-q =  np.linspace(0.01,0.99,182)
-cuantil_teorico = stats.geom.ppf(q , p)
-cuantil_observado = np.quantile(conteo_dias, q)
-
-
-
-fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
-
-ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
-ax1.plot([0, 50], [0, 50], color = "red")
-ax1.set_title("Cuantiles", fontsize=11)
-ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
-ax1.set_ylabel("Cuantiles observados", fontsize=8)
-
-
-cdf_teorico = stats.geom.cdf(cuantil_teorico, p = p)
-ecdf = sm.distributions.ECDF(cuantil_observado)
-
-ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
-         color = "red")
-ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
-            color = "blue",  label = "CDF observado")
-ax2.set_title("Distribución acumulada", fontsize=11)
-ax2.set_xlabel('Datos', fontsize=8)
-ax2.set_ylabel("CDF", fontsize=8)
-ax2.legend()
-
-
-pp_plot(conteo_dias , stats.geom(p=p) , ax = ax3)
-ax3.set_title("Probabilidades", fontsize=11)
-ax3.set_xlabel('Teóricas', fontsize=8)
-ax3.set_ylabel("Observadas", fontsize=8)
-       
-
-densidad_teorica = stats.geom.pmf(np.unique(conteo_dias), p = p)
-
-ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
-         label = "Observada")
-ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
-         label = "Teórica")
-ax4.set_title("Densidad", fontsize=11)
-ax4.set_xlabel('Datos', fontsize=8)
-ax4.set_ylabel("Densidad", fontsize=8)
-ax4.legend()    
-
-fig.suptitle("Ajuste geométrica", fontsize=14)
-fig.tight_layout(pad=0.9)
-fig.subplots_adjust(top=0.85)
-
-plt.savefig('Frecuencias_geometrica.jpeg', format='jpeg', dpi=1300)
-
-plt.show()
-
-#%%
-
-
-
-## Parámetros obtenidos para la poisson
-lamb = np.mean(conteo_dias)
-
-q =  np.linspace(0.01,0.99,182)
-cuantil_teorico = stats.poisson.ppf(q, mu = lamb)
-cuantil_observado = np.quantile(conteo_dias, q)
-
-
-fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
-
-ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
-ax1.plot([0, 50], [0, 50], color = "red")
-ax1.set_title("Cuantiles", fontsize=11)
-ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
-ax1.set_ylabel("Cuantiles observados", fontsize=8)
-
-
-cdf_teorico = stats.poisson.cdf(cuantil_teorico, mu = lamb )
-ecdf = sm.distributions.ECDF(cuantil_observado)
-
-ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
-         color = "red")
-ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
-            color = "blue",  label = "CDF observado")
-ax2.set_title("Distribución acumulada", fontsize=11)
-ax2.set_xlabel('Datos', fontsize=8)
-ax2.set_ylabel("CDF", fontsize=8)
-ax2.legend()
-
-pp_plot(conteo_dias , stats.poisson(mu = lamb) , ax = ax3)
-ax3.set_title("Probabilidades", fontsize=11)
-ax3.set_xlabel('Teóricas', fontsize=8)
-ax3.set_ylabel("Observadas", fontsize=8)
-       
-
-densidad_teorica = stats.poisson.pmf(np.unique(conteo_dias), mu = lamb)
-
-ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
-         label = "Observada")
-ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
-         label = "Teórica")
-ax4.set_title("Densidad", fontsize=11)
-ax4.set_xlabel('Datos', fontsize=8)
-ax4.set_ylabel("Densidad", fontsize=8)
-ax4.legend()    
-
-
-fig.suptitle("Ajuste Poisson", fontsize=14)
-
-fig.tight_layout(pad=0.9)
-fig.subplots_adjust(top=0.85)
-
-plt.savefig('Frecuencias_poisson.jpeg', format='jpeg', dpi=1300)
-
-plt.show()
-
-
-#%%
-
-## Pruebas ks
-#stats.kstest(conteo_dias, "poisson", args = (lamb,))
-#stats.kstest(conteo_dias, "nbinom", args=(size, prob ))
 
 #%%
 

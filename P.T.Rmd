@@ -23,6 +23,8 @@ library(rriskDistributions)
 library(lubridate)
 
 defraudaciones <- read_excel("Defraudaciones enero-junio 2020.xlsx")
+
+defraudaciones <- defraudaciones %>% filter(TipoEvento=="Tarjetas de débito")
 ```
 
 
@@ -199,6 +201,11 @@ F.pois <- fitdist(diasTn, "pois", "mle")
 F.geom <- fitdist(diasTn, "geom", "mle")
 1/(1 + m) - F.geom$estimate[[1]]
 m-F.pois$estimate[[1]]
+```
+
+```{r}
+# fitdist
+# mledist
 ```
 
 
