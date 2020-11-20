@@ -1,10 +1,9 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Oct 27 06:50:33 2020
+Created on Thu Nov 19 20:28:32 2020
 
-@author: Amel
-@author: Esteban
-@author: Marco
+@author: marcoantoniomejiaelizondo
 """
 
 
@@ -30,19 +29,24 @@ datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #%%
 
+datos = datos[datos.TipoEvento=="Tarjetas de débito"]
+# datos = datos[datos.TipoEvento!="Tarjetas de crédito"]
+# datos = datos[datos.TipoEvento=="Incidentes cuenta 147"]
+
+
 #Histograma
 
-# plt.hist(datos['MontoHistorico'])
-# plt.title("Histograma para las reclamaciones")
-# plt.xlabel('Reclamos')
-# plt.ylabel('Conteo') 
+plt.hist(datos['MontoHistorico'])
+plt.title("Histograma para las reclamaciones")
+plt.xlabel('Reclamos')
+plt.ylabel('Conteo') 
 
 
 #%%
 
 logeados = np.log(datos.MontoHistorico)
 
-f = Fitter(logeados, distributions= ['gamma', 'dweibull', 'gennorm'])
+f = Fitter(logeados)
 
 f.fit()
 f.summary()
@@ -62,12 +66,6 @@ plt.legend()
 plt.title("Ajuste de densidades para las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
-
-
-# Para salvar imagen
-## plt.savefig('Prueba.svg', format='svg', dpi=1200)
-
-# plt.savefig('Densidad.jpeg', format='jpeg', dpi=1300)
 
 
 
