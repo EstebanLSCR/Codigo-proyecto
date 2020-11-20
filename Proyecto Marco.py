@@ -20,9 +20,6 @@ import statsmodels.api as sm
 from datetime import datetime, timedelta
 import seaborn as sns
 import locale
-# import rpy2.robjects as robjects
-# from rpy2.robjects import r
-# from rpy2.robjects.packages import importr
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
@@ -47,8 +44,8 @@ f2.fit()
 parametros_pareto2 =  f2.fitted_param['genpareto']
 
 
-#%%
 
+#%%
 #### Algoritmo para las simulaciones todo en escala logarítmica
 
 # m: numero de simulaciones
@@ -71,6 +68,10 @@ size = size*365
 
 
 # Parámetros binomial negativa usando MLE
+import rpy2
+import rpy2.robjects as robjects
+from rpy2.robjects import r
+from rpy2.robjects.packages import importr
 fitdistrplus = importr('fitdistrplus')
 
 r('''

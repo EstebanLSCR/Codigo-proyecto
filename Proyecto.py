@@ -39,6 +39,10 @@ datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 
 #%%
+datos[datos.TipoEvento=="Tarjetas de débito"]
+datos[datos.TipoEvento!="Tarjetas de crédito"]
+datos[datos.TipoEvento=="Incidentes cuenta 147"]
+
 
 logeados = np.log(datos.MontoHistorico)
 
