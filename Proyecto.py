@@ -415,7 +415,23 @@ plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
 
 #%% Frecuencias
 
+fechas = datos.FechaRegistro
+inicio = datetime(2020,1,1)
+fin    = datetime(2020,6,30)
 
+datosF = pd.DataFrame({'Fechas' : datos.FechaRegistro})
+
+ceros = np.arange((fin - inicio).days + 1 - datosF.nunique(0).Fechas)*0
+
+f = np.array(datosF.Fechas.value_counts())
+
+frecuencias = np.concatenate((f,ceros))
+
+n = len(frecuencias)
+m = np.mean(frecuencias)
+v = (n - 1)/n * np.var(frecuencias, ddof=1)
+size = (m**2/(v - m))*365
+p = size/(size+m)
 
 
 
