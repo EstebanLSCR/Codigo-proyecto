@@ -699,7 +699,8 @@ for j in range(0,m):
     totales[j] = sum(Reclamaciones)
 
 #%%
-logeados
+
+locale.setlocale(locale.LC_ALL, 'en_US')
 
 #Media
 locale.format_string("%d", np.mean(totales) , grouping=True)

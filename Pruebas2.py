@@ -41,8 +41,13 @@ plt.ylabel('Conteo')
 
 logeados = np.log(datos.MontoHistorico)
 
+<<<<<<< HEAD
 # f = Fitter(logeados, distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
 f = Fitter(logeados)
+=======
+f = Fitter(logeados)
+
+>>>>>>> 8dd7223c398da2184cbce89e1afb8be57f9a7749
 f.fit()
 f.summary()
 
