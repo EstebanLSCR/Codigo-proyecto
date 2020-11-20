@@ -303,7 +303,7 @@ def pp_plot(x, dist, line=True, ax=None):
 #%% 
 
 rango_fechas = pd.date_range(datos['FechaRegistro'][0] - timedelta(days = 1), 
-        end = datos['FechaRegistro'].max() + timedelta(days = 4) ).to_pydatetime().tolist()
+        end = datos['FechaRegistro'].max() + timedelta(days = 5) ).to_pydatetime().tolist()
 
 
 fechas_vistas = np.array([datetime.strptime(str(x), 
@@ -562,7 +562,7 @@ a = 0.99
 
 
 # # Código para instalar y correr paquetes de R: fitdistrplus y MASS
-# import rpy2.robjects.packages as rpackages
+#import rpy2.robjects.packages as rpackages
 
 # # import R's utility package
 # utils = rpackages.importr('utils')
@@ -570,17 +570,17 @@ a = 0.99
 # # select a mirror for R packages
 # utils.chooseCRANmirror(ind=1)
 
-# packnames = ('fitdistrplus', 'MASS')
+# packnames = ('fitdistrplus', 'MASS', 'stats')
 
 # # paquete para crear strings en R
 # from rpy2.robjects.vectors import StrVector
 
-# # Instala paquetes que no estén instalados
+# # Instala paquetes que no están instalados
 # names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
 # if len(names_to_install) > 0:
 #     utils.install_packages(StrVector(names_to_install))
 
-# # paquetes para importar y crear vectores
+# paquetes para importar y crear vectores
 # import rpy2.robjects as robjects
 # from rpy2.robjects.packages import importr
 # # import R's "base" package
@@ -589,7 +589,7 @@ a = 0.99
 # Stats = importr('stats')
 
 # ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(frecuencias),
-#                                      "nbinom", "mle")
+#                                       "nbinom", "mle")
 
 # # Parámetros binomial negativa 
 # size = ajuste_nbinom[0][0]
@@ -642,6 +642,53 @@ VaR_mle = np.quantile(totales, q = a)
 
 # ES 99
 ES_mle =  np.mean(totales[totales > VaR_mle])
+
+
+#%%
+
+#Simulaciones sin valor extremo usando MLE
+
+# m: numero de simulaciones
+m = 10000
+
+# Nivel de confianza
+a = 0.99
+
+# Fija la semilla para replicar los resultados
+np.random.seed(100)
+
+
+# vector de totales
+totales = np.zeros(m) 
+
+
+# Genere vector de variables N_1 , ... , N_m
+Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
+                               p = parametros_nbinom[1],
+                               loc = 0, size = m)
+
+
+for j in range(0,m):
+    # Vector de reclamaciones
+    
+    Reclamaciones = stats.mielke.rvs(k = parametros_mielke[0],
+                                     s = parametros_mielke[1],
+                        loc = parametros_mielke[2], 
+                        scale = parametros_mielke[3],
+                        size = Frecuencias[j])
+    # Elimina el efecto de los logarítmos
+    totales[j] = sum(np.exp(Reclamaciones))
+
+
+#Promedio
+promedio_mle = np.mean(totales)
+
+# Var 99
+VaR_mle = np.quantile(totales, q = a)
+
+# ES 99
+ES_mle =  np.mean(totales[totales > VaR_mle])
+
 
 
 
@@ -737,6 +784,53 @@ ES_mme =  np.mean(totales[totales > VaR_mme])
 # ES_mle
 # np.mean(Frecuencias)
 # np.mean(totales)
+
+#%%
+
+#Simulaciones sin valor extremo usando MME
+
+# m: numero de simulaciones
+m = 10000
+
+# Nivel de confianza
+a = 0.99
+
+# Fija la semilla para replicar los resultados
+np.random.seed(100)
+
+
+# vector de totales
+totales = np.zeros(m) 
+
+
+# Genere vector de variables N_1 , ... , N_m
+Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
+                               p = parametros_nbinom[1],
+                               loc = 0, size = m)
+
+
+for j in range(0,m):
+    # Vector de reclamaciones
+    
+    Reclamaciones = stats.mielke.rvs(k = parametros_mielke[0],
+                                     s = parametros_mielke[1],
+                        loc = parametros_mielke[2], 
+                        scale = parametros_mielke[3],
+                        size = Frecuencias[j])
+    # Elimina el efecto de los logarítmos
+    totales[j] = sum(np.exp(Reclamaciones))
+
+
+#Promedio
+promedio_mme = np.mean(totales)
+
+# Var 99
+VaR_mme = np.quantile(totales, q = a)
+
+# ES 99
+ES_mme =  np.mean(totales[totales > VaR_mme])
+
+
 
 
 
