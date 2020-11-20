@@ -158,7 +158,7 @@ stats.kstest(logeados, "hypsecant", args=(parametros_hypsecant))
 
 #Corte para valor extremo
 
-logeados2 = logeados[ logeados >= np.quantile(logeados, 0.935)]
+logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
 # len(logeados2)
 
 f2 = Fitter(logeados2, 
@@ -194,7 +194,7 @@ plt.title("Ajuste de densidades para la cola de las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
 
-plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
+# plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
@@ -317,6 +317,7 @@ for i in range(0,len(rango_fechas)):
 
 
 df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
+
 
 
 #%% 
@@ -555,7 +556,7 @@ def sampleo_distr_empirica(n):
 m = 10000
 
 # Umbral para teoría del valor extremo
-q = 0.95
+q = 1#0.95
 
 # Nivel de confianza
 a = 0.99
