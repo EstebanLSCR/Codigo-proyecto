@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 19 20:28:32 2020
+Created on Fri Nov 20 18:48:59 2020
 
 @author: marcoantoniomejiaelizondo
 """
@@ -24,7 +24,7 @@ datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #%%
 
-datos = datos[datos.TipoEvento=="Tarjetas de débito"]
+datos = datos[datos.TipoEvento=="Incidentes cuenta 147"]
 
 #Histograma
 
@@ -39,7 +39,7 @@ plt.ylabel('Conteo')
 logeados = np.log(datos.MontoHistorico)
 
 f = Fitter(logeados, 
-           distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
+            distributions=['dgamma','johnsonsu','mielke','burr','genlogistic'])
 
 f.fit()
 f.summary()
@@ -69,10 +69,10 @@ plt.ylabel('Densidad')
 
 parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
 parametros_dgamma = f.fitted_param['dgamma']
-parametros_dweibull = f.fitted_param['dweibull']
+parametros_johnsonsu= f.fitted_param['johnsonsu']
 parametros_mielke = f.fitted_param['mielke']
 parametros_burr = f.fitted_param['burr']
-parametros_hypsecant = f.fitted_param['hypsecant']
+parametros_genlogistic = f.fitted_param['genlogistic']
 
 fig = plt.figure(dpi = 1300)
 
@@ -95,12 +95,12 @@ ax2.set_xlabel("")
 ax2.set_ylabel("")
 
 ax3 = fig.add_subplot(3, 2, 3)
-sm.qqplot(logeados, stats.dweibull, 
-          distargs= (parametros_dweibull[0],) ,
-          loc = parametros_dweibull[1], 
-          scale = parametros_dweibull[2],
+sm.qqplot(logeados, stats.johnsonsu(parametros_johnsonsu[0],
+                                    parametros_johnsonsu[1], 
+                                    parametros_johnsonsu[2],
+                                    parametros_johnsonsu[3]),
           line = "45", ax = ax3)
-ax3.set_title('Weibull doble', size = 11.0)
+ax3.set_title('johnsonsu', size = 11.0)
 ax3.set_xlabel("")
 ax3.set_ylabel("")
 
@@ -125,10 +125,11 @@ ax5.set_xlabel("")
 ax5.set_ylabel("")
 
 ax6 = fig.add_subplot(3, 2, 6)
-sm.qqplot(logeados, stats.hypsecant(parametros_hypsecant[0],
-                                    parametros_hypsecant[1]),
+sm.qqplot(logeados, stats.genlogistic(parametros_genlogistic[0],
+                                    parametros_genlogistic[1],
+                                    parametros_genlogistic[2]),
           line = "45", ax = ax6)
-ax6.set_title('hypsecant', size = 11.0)
+ax6.set_title('genlogistic', size = 11.0)
 ax6.set_xlabel("")
 ax6.set_ylabel("")
 
@@ -146,10 +147,10 @@ plt.show()
 
 stats.kstest(logeados, "genpareto", args=(parametros_genpareto))
 stats.kstest(logeados, "dgamma", args=(parametros_dgamma))
-stats.kstest(logeados, "dweibull", args=(parametros_dweibull))
+stats.kstest(logeados, "johnsonsu", args=(parametros_johnsonsu))
 stats.kstest(logeados, "mielke", args=(parametros_mielke))
 stats.kstest(logeados, "burr", args=(parametros_burr))
-stats.kstest(logeados, "hypsecant", args=(parametros_hypsecant))
+stats.kstest(logeados, "genlogistic", args=(parametros_genlogistic))
 
 
 
@@ -161,7 +162,7 @@ logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
 # len(logeados2)
 
 f2 = Fitter(logeados2, 
-            distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
+            distributions=['dgamma','johnsonsu','mielke','burr','genlogistic'])
 f2.fit()
 
 plt.title("Histograma de meses de descubrimiento")
@@ -177,10 +178,10 @@ f_pareto =  stats.genpareto.pdf(np.sort(logeados2),
                 scale = parametros_genpareto2[2])
 
 parametros_dgamma2 = f2.fitted_param['dgamma']
-parametros_dweibull2 = f2.fitted_param['dweibull']
+parametros_johnsonsu2 = f2.fitted_param['johnsonsu']
 parametros_mielke2 = f2.fitted_param['mielke']
 parametros_burr2 = f2.fitted_param['burr']
-parametros_hypsecant2 = f2.fitted_param['hypsecant']
+parametros_genlogistic2 = f2.fitted_param['genlogistic']
 
 
 
@@ -222,11 +223,12 @@ ax2.set_xlabel("")
 ax2.set_ylabel("")
 
 ax3 = fig.add_subplot(3, 2, 3)
-sm.qqplot(logeados2, stats.dweibull(parametros_dweibull2[0],
-                                    loc = parametros_dweibull2[1], 
-                                    scale = parametros_dweibull2[2]),
+sm.qqplot(logeados2, stats.johnsonsu(parametros_johnsonsu2[0],
+                                    parametros_johnsonsu2[1], 
+                                    parametros_johnsonsu2[2],
+                                    parametros_johnsonsu2[3]),
           line = "45", ax = ax3)
-ax3.set_title('Weibull doble', size = 11.0)
+ax3.set_title('johnsonsu', size = 11.0)
 ax3.set_xlabel("")
 ax3.set_ylabel("")
 
@@ -251,10 +253,11 @@ ax5.set_xlabel("")
 ax5.set_ylabel("")
 
 ax6 = fig.add_subplot(3, 2, 6)
-sm.qqplot(logeados2, stats.hypsecant(parametros_hypsecant2[0],
-                                     parametros_hypsecant2 [1]),
+sm.qqplot(logeados2, stats.genlogistic(parametros_genlogistic2[0],
+                                     parametros_genlogistic2[1],
+                                     parametros_genlogistic2[2]),
           line = "45", ax = ax6)
-ax6.set_title('hypsecant', size = 11.0)
+ax6.set_title('genlogistic', size = 11.0)
 ax6.set_xlabel("")
 ax6.set_ylabel("")
 
@@ -301,210 +304,89 @@ def pp_plot(x, dist, line=True, ax=None):
 
 #%% 
 
-rango_fechas = pd.date_range(datos['FechaRegistro'][0] - timedelta(days = 1), 
-        end = datos['FechaRegistro'].max() + timedelta(days = 5) ).to_pydatetime().tolist()
+# rango_fechas = pd.date_range(datos['FechaRegistro'][0] - timedelta(days = 1), 
+#         end = datos['FechaRegistro'].max() + timedelta(days = 5) ).to_pydatetime().tolist()
 
 
-fechas_vistas = np.array([datetime.strptime(str(x), 
-                    "%Y-%m-%d %H:%M:%S") for x in datos.FechaRegistro ])
+# fechas_vistas = np.array([datetime.strptime(str(x), 
+#                     "%Y-%m-%d %H:%M:%S") for x in datos.FechaRegistro ])
 
 
-conteo_dias = np.zeros(len(rango_fechas))
+# conteo_dias = np.zeros(len(rango_fechas))
 
-for i in range(0,len(rango_fechas)):
-    conteo_dias[i] = sum(fechas_vistas == rango_fechas[i])
-
-
-df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
+# for i in range(0,len(rango_fechas)):
+#     conteo_dias[i] = sum(fechas_vistas == rango_fechas[i])
 
 
+# df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
 
-#%% 
-
-## Parámetros obtenidos para la poisson
-lamb = np.mean(conteo_dias)
-
-q =  np.linspace(0.01,0.99,182)
-cuantil_teorico = stats.poisson.ppf(q, mu = lamb)
-cuantil_observado = np.quantile(conteo_dias, q)
-
-
-fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
-
-ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
-ax1.plot([0, 50], [0, 50], color = "red")
-ax1.set_title("Cuantiles", fontsize=11)
-ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
-ax1.set_ylabel("Cuantiles observados", fontsize=8)
-
-
-cdf_teorico = stats.poisson.cdf(cuantil_teorico, mu = lamb )
-ecdf = sm.distributions.ECDF(cuantil_observado)
-
-ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
-         color = "red")
-ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
-            color = "blue",  label = "CDF observado")
-ax2.set_title("Distribución acumulada", fontsize=11)
-ax2.set_xlabel('Datos', fontsize=8)
-ax2.set_ylabel("CDF", fontsize=8)
-ax2.legend()
-
-pp_plot(conteo_dias , stats.poisson(mu = lamb) , ax = ax3)
-ax3.set_title("Probabilidades", fontsize=11)
-ax3.set_xlabel('Teóricas', fontsize=8)
-ax3.set_ylabel("Observadas", fontsize=8)
-       
-
-densidad_teorica = stats.poisson.pmf(np.unique(conteo_dias), mu = lamb)
-
-ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
-         label = "Observada")
-ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
-         label = "Teórica")
-ax4.set_title("Densidad", fontsize=11)
-ax4.set_xlabel('Datos', fontsize=8)
-ax4.set_ylabel("Densidad", fontsize=8)
-ax4.legend()    
-
-
-fig.suptitle("Ajuste Poisson", fontsize=14)
-
-fig.tight_layout(pad=0.9)
-fig.subplots_adjust(top=0.85)
-
-# plt.savefig('Frecuencias_poisson.jpeg', format='jpeg', dpi=1300)
-
-plt.show()
-
-
-
-
-#%% 
-
-## Parámetros obtenidos en R para la geometrica
-p = 1/(1 + np.mean(conteo_dias))
-
-
-q =  np.linspace(0.01,0.99,182)
-cuantil_teorico = stats.geom.ppf(q , p)
-cuantil_observado = np.quantile(conteo_dias, q)
-
-
-
-fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
-
-ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
-ax1.plot([0, 50], [0, 50], color = "red")
-ax1.set_title("Cuantiles", fontsize=11)
-ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
-ax1.set_ylabel("Cuantiles observados", fontsize=8)
-
-
-cdf_teorico = stats.geom.cdf(cuantil_teorico, p = p)
-ecdf = sm.distributions.ECDF(cuantil_observado)
-
-ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
-         color = "red")
-ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
-            color = "blue",  label = "CDF observado")
-ax2.set_title("Distribución acumulada", fontsize=11)
-ax2.set_xlabel('Datos', fontsize=8)
-ax2.set_ylabel("CDF", fontsize=8)
-ax2.legend()
-
-
-pp_plot(conteo_dias , stats.geom(p=p) , ax = ax3)
-ax3.set_title("Probabilidades", fontsize=11)
-ax3.set_xlabel('Teóricas', fontsize=8)
-ax3.set_ylabel("Observadas", fontsize=8)
-       
-
-densidad_teorica = stats.geom.pmf(np.unique(conteo_dias), p = p)
-
-ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
-         label = "Observada")
-ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
-         label = "Teórica")
-ax4.set_title("Densidad", fontsize=11)
-ax4.set_xlabel('Datos', fontsize=8)
-ax4.set_ylabel("Densidad", fontsize=8)
-ax4.legend()    
-
-fig.suptitle("Ajuste geométrica", fontsize=14)
-fig.tight_layout(pad=0.9)
-fig.subplots_adjust(top=0.85)
-
-# plt.savefig('Frecuencias_geometrica.jpeg', format='jpeg', dpi=1300)
-
-plt.show()
 
 
 
 #%%
 
-## Parámetros obtenidos en R para la binomial negativa
-n = len(conteo_dias)
-mu = np.mean(conteo_dias)
-v = (n - 1)/n * np.var(conteo_dias, ddof=1)
-size = (mu**2/(v - mu))
-prob = size/(size+mu)
+# ## Parámetros obtenidos en R para la binomial negativa
+# n = len(conteo_dias)
+# mu = np.mean(conteo_dias)
+# v = (n - 1)/n * np.var(conteo_dias, ddof=1)
+# size = (mu**2/(v - mu))
+# prob = size/(size+mu)
 
 
-q =  np.linspace(0.01,0.99,182)
-cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
-cuantil_observado = np.quantile(conteo_dias, q)
+# q =  np.linspace(0.01,0.99,182)
+# cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
+# cuantil_observado = np.quantile(conteo_dias, q)
 
 
 
-fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+# fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
 
-sm.qqplot(conteo_dias, stats.nbinom(n = size, p = prob),
-          loc = 0, scale = 1,
-          line = "45", ax = ax1)
-ax1.set_title("Cuantiles", fontsize=11)
-ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
-ax1.set_ylabel("Cuantiles observados", fontsize=8)
+# sm.qqplot(conteo_dias, stats.nbinom(n = size, p = prob),
+#           loc = 0, scale = 1,
+#           line = "45", ax = ax1)
+# ax1.set_title("Cuantiles", fontsize=11)
+# ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+# ax1.set_ylabel("Cuantiles observados", fontsize=8)
 
 
-cdf_teorico = stats.nbinom.cdf(cuantil_teorico, n = size, p = prob)
-ecdf = sm.distributions.ECDF(cuantil_observado)
+# cdf_teorico = stats.nbinom.cdf(cuantil_teorico, n = size, p = prob)
+# ecdf = sm.distributions.ECDF(cuantil_observado)
 
-ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
-         color = "red")
-ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
-            color = "blue",  label = "CDF observado")
-ax2.set_title("Distribución acumulada", fontsize=11)
-ax2.set_xlabel('Datos', fontsize=8)
-ax2.set_ylabel("CDF", fontsize=8)
-ax2.legend()
+# ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+#          color = "red")
+# ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+#             color = "blue",  label = "CDF observado")
+# ax2.set_title("Distribución acumulada", fontsize=11)
+# ax2.set_xlabel('Datos', fontsize=8)
+# ax2.set_ylabel("CDF", fontsize=8)
+# ax2.legend()
 
 
-pp_plot(conteo_dias , stats.nbinom(n = size, p=prob) , ax = ax3)
-ax3.set_title("Probabilidades", fontsize=11)
-ax3.set_xlabel('Teóricas', fontsize=8)
-ax3.set_ylabel("Observadas", fontsize=8)
+# pp_plot(conteo_dias , stats.nbinom(n = size, p=prob) , ax = ax3)
+# ax3.set_title("Probabilidades", fontsize=11)
+# ax3.set_xlabel('Teóricas', fontsize=8)
+# ax3.set_ylabel("Observadas", fontsize=8)
        
 
-densidad_teorica = stats.nbinom.pmf(np.unique(conteo_dias), n = size, p = prob)
+# densidad_teorica = stats.nbinom.pmf(np.unique(conteo_dias), n = size, p = prob)
 
-ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
-         label = "Observada")
-ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
-         label = "Teórica")
-ax4.set_title("Densidad", fontsize=11)
-ax4.set_xlabel('Datos', fontsize=8)
-ax4.set_ylabel("Densidad", fontsize=8)
-ax4.legend()    
+# ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+#          label = "Observada")
+# ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+#          label = "Teórica")
+# ax4.set_title("Densidad", fontsize=11)
+# ax4.set_xlabel('Datos', fontsize=8)
+# ax4.set_ylabel("Densidad", fontsize=8)
+# ax4.legend()    
 
-fig.suptitle("Ajuste binomial negativa", fontsize=14)
-fig.tight_layout(pad=0.9)
-fig.subplots_adjust(top=0.85)
+# fig.suptitle("Ajuste binomial negativa", fontsize=14)
+# fig.tight_layout(pad=0.9)
+# fig.subplots_adjust(top=0.85)
 
-# plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
+# # plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
 
-plt.show()
+# plt.show()
 
 
 
@@ -598,7 +480,7 @@ a = 0.99
 # size = size*365
 
 # parametros_nbinom = np.array([size,prob])
-parametros_nbinom = np.array([26.65934,0.022993])
+parametros_nbinom = np.array([98.35203,0.3577528])
 
     
 # vector de totales
@@ -687,7 +569,7 @@ ES_mle1 =  np.mean(totales[totales > VaR_mle1])
 
 #%%
 
-#Simulaciones sin valor extremo usando MLE burr
+#Simulaciones sin valor extremo usando MLE genlogistic
 
 # m: numero de simulaciones
 m = 10000
@@ -712,11 +594,10 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
 for j in range(0,m):
     # Vector de reclamaciones
     
-    Reclamaciones = stats.burr.rvs(parametros_burr[0],
-                                   parametros_burr[1],
-                                   loc = parametros_burr[2], 
-                                   scale = parametros_burr[3],
-                                   size = Frecuencias[j])
+    Reclamaciones = stats.genlogistic.rvs(parametros_genlogistic[0],
+                                          parametros_genlogistic[1],
+                                          parametros_genlogistic[2], 
+                                          size = Frecuencias[j])
     # Elimina el efecto de los logarítmos
     totales[j] = sum(np.exp(Reclamaciones))
 
@@ -725,13 +606,6 @@ VaR_mle2 = np.quantile(totales, q = a)
 
 # ES 99
 ES_mle2 =  np.mean(totales[totales > VaR_mle2])
-
-
-
-
-
-
-
 
 
 
@@ -856,7 +730,7 @@ ES_mme1 =  np.mean(totales[totales > VaR_mme1])
 
 #%%
 
-#Simulaciones sin valor extremo usando MME burr
+#Simulaciones sin valor extremo usando MME genlogistic
 
 # m: numero de simulaciones
 m = 10000
@@ -881,11 +755,10 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
 for j in range(0,m):
     # Vector de reclamaciones
     
-    Reclamaciones = stats.burr.rvs(parametros_burr[0],
-                                   parametros_burr[1],
-                                   loc = parametros_burr[2], 
-                                   scale = parametros_burr[3],
-                                   size = Frecuencias[j])
+    Reclamaciones = stats.genlogistic.rvs(parametros_genlogistic[0],
+                                          parametros_genlogistic[1],
+                                          parametros_genlogistic[2], 
+                                          size = Frecuencias[j])
     # Elimina el efecto de los logarítmos
     totales[j] = sum(np.exp(Reclamaciones))
 
@@ -901,57 +774,47 @@ ES_mme2 =  np.mean(totales[totales > VaR_mme2])
 
 
 
-
-
 #%%
 
 
 # MLE
-# VaR_mle = 1458707819.0498822
-# ES_mle = 3423090819.671942
-# meantotales_mle = 300680474.9212077
-# meanFrecuencias_mle = 1134.4377
+# VaR_mle = 3328057788.5809045
+# ES_mle = 15541064098.144634
+# meantotales_mle = 480236307.0927336
+# meanFrecuencias_mle = 176.5642
 
-# VaR_mle1 = 456682075.77371794
-# ES_mle1 = 1621753948.3011205
-# meantotales_mle1 = 241566631.63635278
-# meanFrecuencias_mle1 = 1134.4377
+# VaR_mle1 = 6156191658.251817
+# ES_mle1 = 39115736143.4636
+# meantotales_mle1 = 840185466.745344
+# meanFrecuencias_mle1 = 176.5642
 
-# VaR_mle2 = 456627061.404793
-# ES_mle2 = 1617343392.435128
-# meantotales_mle2 = 241507417.41621348
-# meanFrecuencias_mle2 = 1134.4377
-
+# VaR_mle2 = 3920777753.0751286
+# ES_mle2 = 12282778967.692156
+# meantotales_mle2 = 551246064.907637
+# meanFrecuencias_mle2 = 176.5642
 
 
 
 
 # MME
-# VaR_mme = 1260005806.9908042
-# ES_mme = 4073425490.793548
-# meantotales_mme = 305709202.56214356
-# meanFrecuencias_mme = 1133.5247
+# VaR_mme = 3345361047.9872227
+# ES_mme = 12990311584.932837
+# meantotales_mme = 452141553.16091484
+# meanFrecuencias_mme = 176.6153
 
-# VaR_mme1 = 455634132.9564944
-# ES_mme1 = 1620908523.357132
-# meantotales_mme1 = 241384390.87721083
-# meanFrecuencias_mme1 = 1133.5247
+# VaR_mme1 = 6135398553.688404
+# ES_mme1 = 39142524675.64424
+# meantotales_mme1 = 840262569.896537
+# meanFrecuencias_mme1 = 176.6153
 
-# VaR_mme2 = 455396172.4244897
-# ES_mme2 = 1616484722.2322156
-# meantotales_mme2 = 241325185.3962745
-# meanFrecuencias_mme2 = 1133.5247
-
-
-
-# sum(frecuencias)*2 = 1130
-# sum(np.exp(logeados))*2 = 203334063.58060005
+# VaR_mme2 = 3828339425.791828
+# ES_mme2 = 12303655802.236513
+# meantotales_mme2 = 551326580.5164571
+# meanFrecuencias_mme2 = 176.6153
 
 
 
-
-
-
-
+# sum(frecuencias)*2 = 176
+# sum(np.exp(logeados))*2 = 572602330.9861999
 
 

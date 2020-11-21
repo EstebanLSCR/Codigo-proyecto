@@ -24,7 +24,7 @@ library(lubridate)
 
 defraudaciones <- read_excel("Defraudaciones enero-junio 2020.xlsx")
 
-defraudaciones <- defraudaciones %>% filter(TipoEvento=="Tarjetas de débito")
+defraudaciones <- defraudaciones %>% filter(TipoEvento=="Incidentes cuenta 147")
 ```
 
 
@@ -100,29 +100,34 @@ diasTn
 cumsum(diasTn)
 
 
-
-F.nbinom <- fitdist(diasTn, "nbinom", method="mme")
 F.pois <- fitdist(diasTn, "pois", "mme")
+
+plot(F.pois)
+plot(F.pois, demp = TRUE)
+plot(F.pois, histo = FALSE, demp = TRUE)
+
+cdfcomp(F.pois, addlegend=FALSE)
+denscomp(F.pois, addlegend=FALSE)
+ppcomp(F.pois, addlegend=FALSE)
+qqcomp(F.pois, addlegend=FALSE)
+```
+
+```{r}
 F.geom <- fitdist(diasTn, "geom", "mme")
-# 
-# 
-# plot(F.pois)
-# plot(F.pois, demp = TRUE)
-# plot(F.pois, histo = FALSE, demp = TRUE)
-# 
-# cdfcomp(F.pois, addlegend=FALSE)
-# denscomp(F.pois, addlegend=FALSE)
-# ppcomp(F.pois, addlegend=FALSE)
-# qqcomp(F.pois, addlegend=FALSE)
-# 
-# plot(F.geom)
-# plot(F.geom, demp = TRUE)
-# plot(F.geom, histo = FALSE, demp = TRUE)
-# 
-# cdfcomp(F.geom, addlegend=FALSE)
-# denscomp(F.geom, addlegend=FALSE)
-# ppcomp(F.geom, addlegend=FALSE)
-# qqcomp(F.geom, addlegend=FALSE)
+
+plot(F.geom)
+plot(F.geom, demp = TRUE)
+plot(F.geom, histo = FALSE, demp = TRUE)
+
+cdfcomp(F.geom, addlegend=FALSE)
+denscomp(F.geom, addlegend=FALSE)
+ppcomp(F.geom, addlegend=FALSE)
+qqcomp(F.geom, addlegend=FALSE)
+
+```
+
+```{r}
+F.nbinom <- fitdist(diasTn, "nbinom", method="mme")
 
 plot(F.nbinom)
 plot(F.nbinom, demp = TRUE)
@@ -132,15 +137,6 @@ cdfcomp(F.nbinom, addlegend=FALSE)
 denscomp(F.nbinom, addlegend=FALSE)
 ppcomp(F.nbinom, addlegend=FALSE)
 qqcomp(F.nbinom, addlegend=FALSE)
-
-
-
-
-# sum(c(0,20,1,0,0,0,0,9,1,1,0,0,0,1,10,1,8,0,0,0,0,0,15,0,0,0,0,1,15,0,1,0,0,0,0,17,0,0,0,0,0,0,7,16,12,0,0,0,0,6,0,1,0,0,6,0,0,1,0,0,0,12,0,9,10,18,0,0,2,0,19,1,0,0,0,1,1,15,2,1,0,0,24,0,1,2,14,0,0,3,4,27,0,34,0,0,0,0,0,0,0,0,0,0,0,0,1,11,0,0,0,0,1,6,0,0,0,0,28,0,0,0,0,0,25,0,5,8,2,0,0,0,16,2,1,0,0,0,0,31,2,14,32,0,0,4,23,4,7,2,0,0,1,22,14,0,0,0,0,0,51,0,7,1,0,0,4,7,4,0,7,0,0,1,16,6,28,8,0,0,0,0))
-
-
-hist(diasTn)
-max(diasTn)
 ```
 
 
@@ -190,17 +186,17 @@ F.nbinom$estimate[[1]] / (F.nbinom$estimate[[2]]+F.nbinom$estimate[[1]])
 
 
 ```{r}
-F.pois <- fitdist(diasTn, "pois", "mme")
-F.geom <- fitdist(diasTn, "geom", "mme")
-1/(1 + m) - F.geom$estimate[[1]]
-m-F.pois$estimate[[1]]
+# F.pois <- fitdist(diasTn, "pois", "mme")
+# F.geom <- fitdist(diasTn, "geom", "mme")
+# 1/(1 + m) - F.geom$estimate[[1]]
+# m-F.pois$estimate[[1]]
 ```
 
 ```{r}
-F.pois <- fitdist(diasTn, "pois", "mle")
-F.geom <- fitdist(diasTn, "geom", "mle")
-1/(1 + m) - F.geom$estimate[[1]]
-m-F.pois$estimate[[1]]
+# F.pois <- fitdist(diasTn, "pois", "mle")
+# F.geom <- fitdist(diasTn, "geom", "mle")
+# 1/(1 + m) - F.geom$estimate[[1]]
+# m-F.pois$estimate[[1]]
 ```
 
 ```{r}
