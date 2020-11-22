@@ -853,7 +853,6 @@ ES_mme1 =  np.mean(totales[totales > VaR_mme1])
 
 
 
-
 #%%
 
 #Simulaciones sin valor extremo usando MME burr

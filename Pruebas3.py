@@ -624,7 +624,7 @@ q = 0.95
 
 # Nivel de confianza
 a = 0.99
-
+ 
 
 # Parámetros binomial negativa 
 n = len(frecuencias)

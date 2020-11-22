@@ -249,4 +249,3 @@ ES_mme =  np.mean(totales[totales > VaR_mme])
 
 
 
-
