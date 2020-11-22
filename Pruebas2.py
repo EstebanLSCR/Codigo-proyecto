@@ -31,55 +31,136 @@ datos = datos[datos.TipoEvento=="Tarjetas de crédito"]
 
 #Histograma
 
-plt.hist(datos['MontoHistorico'])
-plt.title("Histograma para las reclamaciones")
-plt.xlabel('Reclamos')
-plt.ylabel('Conteo') 
+# plt.hist(datos['MontoHistorico'])
+# plt.title("Histograma para las reclamaciones")
+# plt.xlabel('Reclamos')
+# plt.ylabel('Conteo') 
 
 
 #%%
 
+# logeados = np.log(datos.MontoHistorico)
+
+# f = Fitter(logeados, 
+#            distributions=['dgamma','dweibull','foldcauchy','laplace','loglaplace'])
+
+# f.fit()
+# f.summary()
+
+# parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
+
+# f_pareto =  stats.genpareto.pdf(np.sort(logeados), 
+#                 c = parametros_genpareto[0], 
+#                 loc = parametros_genpareto[1], 
+#                 scale = parametros_genpareto[2])
+
+
+# plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
+# plt.legend()
+
+
+# plt.title("Ajuste de densidades para las reclamaciones")
+# plt.xlabel('Reclamos transformación logarítmica')
+# plt.ylabel('Densidad') 
+
 logeados = np.log(datos.MontoHistorico)
 
 f = Fitter(logeados, 
-           distributions=['dgamma','dweibull','foldcauchy','laplace','loglaplace'])
+           distributions=['dgamma','dweibull'])
 
 f.fit()
 f.summary()
 
-parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
-
-f_pareto =  stats.genpareto.pdf(np.sort(logeados), 
-                c = parametros_genpareto[0], 
-                loc = parametros_genpareto[1], 
-                scale = parametros_genpareto[2])
-
-
-plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
-plt.legend()
-
-
-plt.title("Ajuste de densidades para las reclamaciones")
+# plt.title("Ajuste de densidades para las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
 
-
+plt.savefig('P2.DenRec.jpeg', format='jpeg', dpi=1300)
 
 
 #%%
 
 ## Gráfico de cuantiles
 
-parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
+# parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
+# parametros_dgamma = f.fitted_param['dgamma']
+# parametros_dweibull = f.fitted_param['dweibull']
+# parametros_foldcauchy = f.fitted_param['foldcauchy']
+# parametros_laplace = f.fitted_param['laplace']
+# parametros_loglaplace = f.fitted_param['loglaplace']
+
+# fig = plt.figure(dpi = 1300)
+
+# ax1 = fig.add_subplot(3, 2, 1)
+# sm.qqplot(logeados, stats.dgamma(parametros_dgamma[0], 
+#                                  loc = parametros_dgamma[1], 
+#                                  scale = parametros_dgamma[2]),
+#           line = "45", ax = ax1)
+# ax1.set_title('dgamma', size = 11.0)
+# ax1.set_xlabel("")
+# ax1.set_ylabel("")
+
+# ax2 = fig.add_subplot(3, 2, 2)
+# sm.qqplot(logeados, stats.genpareto(parametros_genpareto[0], 
+#                                     loc = parametros_genpareto[1], 
+#                                     scale = parametros_genpareto[2]),
+#           line = "45",ax = ax2)
+# ax2.set_title('Pareto generalizada', size = 11.0)
+# ax2.set_xlabel("")
+# ax2.set_ylabel("")
+
+# ax3 = fig.add_subplot(3, 2, 3)
+# sm.qqplot(logeados, stats.dweibull, 
+#           distargs= (parametros_dweibull[0],) ,
+#           loc = parametros_dweibull[1], 
+#           scale = parametros_dweibull[2],
+#           line = "45", ax = ax3)
+# ax3.set_title('Weibull doble', size = 11.0)
+# ax3.set_xlabel("")
+# ax3.set_ylabel("")
+
+# ax4 = fig.add_subplot(3, 2, 4)
+# sm.qqplot(logeados, stats.foldcauchy(parametros_foldcauchy[0],
+#                                      parametros_foldcauchy[1],
+#                                      parametros_foldcauchy[2]),
+#           line = "45", ax = ax4)
+# ax4.set_title('foldcauchy', size = 11.0)
+# ax4.set_xlabel("")
+# ax4.set_ylabel("")
+
+# ax5 = fig.add_subplot(3, 2, 5)
+# sm.qqplot(logeados, stats.laplace(parametros_laplace[0],
+#                                   parametros_laplace[1]),
+#           line = "45", ax = ax5)
+# ax5.set_title('laplace', size = 11.0)
+# ax5.set_xlabel("")
+# ax5.set_ylabel("")
+
+# ax6 = fig.add_subplot(3, 2, 6)
+# sm.qqplot(logeados, stats.loglaplace(parametros_loglaplace[0],
+#                                     parametros_loglaplace[1],
+#                                     parametros_loglaplace[2]),
+#           line = "45", ax = ax6)
+# ax6.set_title('loglaplace', size = 11.0)
+# ax6.set_xlabel("")
+# ax6.set_ylabel("")
+
+# fig.tight_layout(pad=0.7)
+
+# fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
+# fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
+
+# fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
+# fig.subplots_adjust(top=0.86)
+# plt.show()
+
+
 parametros_dgamma = f.fitted_param['dgamma']
 parametros_dweibull = f.fitted_param['dweibull']
-parametros_foldcauchy = f.fitted_param['foldcauchy']
-parametros_laplace = f.fitted_param['laplace']
-parametros_loglaplace = f.fitted_param['loglaplace']
 
 fig = plt.figure(dpi = 1300)
 
-ax1 = fig.add_subplot(3, 2, 1)
+ax1 = fig.add_subplot(1, 2, 1)
 sm.qqplot(logeados, stats.dgamma(parametros_dgamma[0], 
                                  loc = parametros_dgamma[1], 
                                  scale = parametros_dgamma[2]),
@@ -88,184 +169,151 @@ ax1.set_title('dgamma', size = 11.0)
 ax1.set_xlabel("")
 ax1.set_ylabel("")
 
-ax2 = fig.add_subplot(3, 2, 2)
-sm.qqplot(logeados, stats.genpareto(parametros_genpareto[0], 
-                                    loc = parametros_genpareto[1], 
-                                    scale = parametros_genpareto[2]),
+ax2 = fig.add_subplot(1, 2, 2)
+sm.qqplot(logeados, stats.dweibull(parametros_dweibull[0], 
+                                    loc = parametros_dweibull[1], 
+                                    scale = parametros_dweibull[2]),
           line = "45",ax = ax2)
-ax2.set_title('Pareto generalizada', size = 11.0)
+ax2.set_title('dweibull', size = 11.0)
 ax2.set_xlabel("")
 ax2.set_ylabel("")
-
-ax3 = fig.add_subplot(3, 2, 3)
-sm.qqplot(logeados, stats.dweibull, 
-          distargs= (parametros_dweibull[0],) ,
-          loc = parametros_dweibull[1], 
-          scale = parametros_dweibull[2],
-          line = "45", ax = ax3)
-ax3.set_title('Weibull doble', size = 11.0)
-ax3.set_xlabel("")
-ax3.set_ylabel("")
-
-ax4 = fig.add_subplot(3, 2, 4)
-sm.qqplot(logeados, stats.foldcauchy(parametros_foldcauchy[0],
-                                     parametros_foldcauchy[1],
-                                     parametros_foldcauchy[2]),
-          line = "45", ax = ax4)
-ax4.set_title('foldcauchy', size = 11.0)
-ax4.set_xlabel("")
-ax4.set_ylabel("")
-
-ax5 = fig.add_subplot(3, 2, 5)
-sm.qqplot(logeados, stats.laplace(parametros_laplace[0],
-                                  parametros_laplace[1]),
-          line = "45", ax = ax5)
-ax5.set_title('laplace', size = 11.0)
-ax5.set_xlabel("")
-ax5.set_ylabel("")
-
-ax6 = fig.add_subplot(3, 2, 6)
-sm.qqplot(logeados, stats.loglaplace(parametros_loglaplace[0],
-                                    parametros_loglaplace[1],
-                                    parametros_loglaplace[2]),
-          line = "45", ax = ax6)
-ax6.set_title('loglaplace', size = 11.0)
-ax6.set_xlabel("")
-ax6.set_ylabel("")
 
 fig.tight_layout(pad=0.7)
 
 fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
 fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
 
-fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
+# fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
 fig.subplots_adjust(top=0.86)
+plt.savefig('P2.QQDist.jpeg', format='jpeg', dpi=1300)
 plt.show()
 
 
  #%% Pruebas KS
 
-stats.kstest(logeados, "genpareto", args=(parametros_genpareto))
+# stats.kstest(logeados, "genpareto", args=(parametros_genpareto))
+# stats.kstest(logeados, "dgamma", args=(parametros_dgamma))
+# stats.kstest(logeados, "dweibull", args=(parametros_dweibull))
+# stats.kstest(logeados, "foldcauchy", args=(parametros_foldcauchy))
+# stats.kstest(logeados, "laplace", args=(parametros_laplace))
+# stats.kstest(logeados, "loglaplace", args=(parametros_loglaplace))
+
 stats.kstest(logeados, "dgamma", args=(parametros_dgamma))
 stats.kstest(logeados, "dweibull", args=(parametros_dweibull))
-stats.kstest(logeados, "foldcauchy", args=(parametros_foldcauchy))
-stats.kstest(logeados, "laplace", args=(parametros_laplace))
-stats.kstest(logeados, "loglaplace", args=(parametros_loglaplace))
-
 
 
 #%%
 
-#Corte para valor extremo
+# #Corte para valor extremo
 
-logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-# len(logeados2)
+# logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+# # len(logeados2)
 
-f2 = Fitter(logeados2, 
-            distributions=['dgamma','dweibull','foldcauchy','laplace','loglaplace'])
-f2.fit()
+# f2 = Fitter(logeados2, 
+#             distributions=['dgamma','dweibull','foldcauchy','laplace','loglaplace'])
+# f2.fit()
 
-plt.title("Histograma de meses de descubrimiento")
-plt.xlabel('Mes')
-plt.ylabel('Conteo') 
-
-
-parametros_genpareto2 = stats.genpareto.fit(logeados2, loc = 15 )
-
-f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
-                c = parametros_genpareto2[0], 
-                loc = parametros_genpareto2[1], 
-                scale = parametros_genpareto2[2])
-
-parametros_dgamma2 = f2.fitted_param['dgamma']
-parametros_dweibull2 = f2.fitted_param['dweibull']
-parametros_foldcauchy2 = f2.fitted_param['foldcauchy']
-parametros_laplace2 = f2.fitted_param['laplace']
-parametros_loglaplace2 = f2.fitted_param['loglaplace']
+# plt.title("Histograma de meses de descubrimiento")
+# plt.xlabel('Mes')
+# plt.ylabel('Conteo') 
 
 
+# parametros_genpareto2 = stats.genpareto.fit(logeados2, loc = 15 )
 
-f2.summary()
-plt.plot(np.sort(logeados2), f_pareto, color = "purple", label = "genpareto")
-plt.legend()
+# f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
+#                 c = parametros_genpareto2[0], 
+#                 loc = parametros_genpareto2[1], 
+#                 scale = parametros_genpareto2[2])
+
+# parametros_dgamma2 = f2.fitted_param['dgamma']
+# parametros_dweibull2 = f2.fitted_param['dweibull']
+# parametros_foldcauchy2 = f2.fitted_param['foldcauchy']
+# parametros_laplace2 = f2.fitted_param['laplace']
+# parametros_loglaplace2 = f2.fitted_param['loglaplace']
 
 
-plt.title("Ajuste de densidades para la cola de las reclamaciones")
-plt.xlabel('Reclamos transformación logarítmica')
-plt.ylabel('Densidad') 
 
-# plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
+# f2.summary()
+# plt.plot(np.sort(logeados2), f_pareto, color = "purple", label = "genpareto")
+# plt.legend()
 
-plt.show()
+
+# plt.title("Ajuste de densidades para la cola de las reclamaciones")
+# plt.xlabel('Reclamos transformación logarítmica')
+# plt.ylabel('Densidad') 
+
+# # plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
+
+# plt.show()
 
 #%%
 
-## Gráfico de cuantiles cola
+# ## Gráfico de cuantiles cola
 
-fig = plt.figure(dpi = 1300)
+# fig = plt.figure(dpi = 1300)
 
-ax1 = fig.add_subplot(3, 2, 1)
-sm.qqplot(logeados2, stats.dgamma(parametros_dgamma2[0], 
-                                 loc = parametros_dgamma2[1], 
-                                 scale = parametros_dgamma2[2]),
-          line = "45", ax = ax1)
-ax1.set_title('dgamma', size = 11.0)
-ax1.set_xlabel("")
-ax1.set_ylabel("")
+# ax1 = fig.add_subplot(3, 2, 1)
+# sm.qqplot(logeados2, stats.dgamma(parametros_dgamma2[0], 
+#                                  loc = parametros_dgamma2[1], 
+#                                  scale = parametros_dgamma2[2]),
+#           line = "45", ax = ax1)
+# ax1.set_title('dgamma', size = 11.0)
+# ax1.set_xlabel("")
+# ax1.set_ylabel("")
 
-ax2 = fig.add_subplot(3, 2, 2)
-sm.qqplot(logeados2, stats.genpareto(parametros_genpareto2[0], 
-                                    loc = parametros_genpareto2[1], 
-                                    scale = parametros_genpareto2[2]),
-          line = "45",ax = ax2)
-ax2.set_title('Pareto generalizada', size = 11.0)
-ax2.set_xlabel("")
-ax2.set_ylabel("")
+# ax2 = fig.add_subplot(3, 2, 2)
+# sm.qqplot(logeados2, stats.genpareto(parametros_genpareto2[0], 
+#                                     loc = parametros_genpareto2[1], 
+#                                     scale = parametros_genpareto2[2]),
+#           line = "45",ax = ax2)
+# ax2.set_title('Pareto generalizada', size = 11.0)
+# ax2.set_xlabel("")
+# ax2.set_ylabel("")
 
-ax3 = fig.add_subplot(3, 2, 3)
-sm.qqplot(logeados2, stats.dweibull(parametros_dweibull2[0],
-                                    loc = parametros_dweibull2[1], 
-                                    scale = parametros_dweibull2[2]),
-          line = "45", ax = ax3)
-ax3.set_title('Weibull doble', size = 11.0)
-ax3.set_xlabel("")
-ax3.set_ylabel("")
+# ax3 = fig.add_subplot(3, 2, 3)
+# sm.qqplot(logeados2, stats.dweibull(parametros_dweibull2[0],
+#                                     loc = parametros_dweibull2[1], 
+#                                     scale = parametros_dweibull2[2]),
+#           line = "45", ax = ax3)
+# ax3.set_title('Weibull doble', size = 11.0)
+# ax3.set_xlabel("")
+# ax3.set_ylabel("")
 
-ax4 = fig.add_subplot(3, 2, 4)
-sm.qqplot(logeados2, stats.foldcauchy(parametros_foldcauchy2[0],
-                                      parametros_foldcauchy2[1],
-                                      parametros_foldcauchy2[2]),
-          line = "45", ax = ax4)
-ax4.set_title('foldcauchy', size = 11.0)
-ax4.set_xlabel("")
-ax4.set_ylabel("")
+# ax4 = fig.add_subplot(3, 2, 4)
+# sm.qqplot(logeados2, stats.foldcauchy(parametros_foldcauchy2[0],
+#                                       parametros_foldcauchy2[1],
+#                                       parametros_foldcauchy2[2]),
+#           line = "45", ax = ax4)
+# ax4.set_title('foldcauchy', size = 11.0)
+# ax4.set_xlabel("")
+# ax4.set_ylabel("")
 
-ax5 = fig.add_subplot(3, 2, 5)
-sm.qqplot(logeados2, stats.laplace(parametros_laplace2[0],
-                                parametros_laplace2[1]),
-          line = "45", ax = ax5)
-ax5.set_title('laplace', size = 11.0)
-ax5.set_xlabel("")
-ax5.set_ylabel("")
+# ax5 = fig.add_subplot(3, 2, 5)
+# sm.qqplot(logeados2, stats.laplace(parametros_laplace2[0],
+#                                 parametros_laplace2[1]),
+#           line = "45", ax = ax5)
+# ax5.set_title('laplace', size = 11.0)
+# ax5.set_xlabel("")
+# ax5.set_ylabel("")
 
-ax6 = fig.add_subplot(3, 2, 6)
-sm.qqplot(logeados2, stats.loglaplace(parametros_loglaplace2[0],
-                                     parametros_loglaplace2[1],
-                                     parametros_loglaplace2[2]),
-          line = "45", ax = ax6)
-ax6.set_title('loglaplace', size = 11.0)
-ax6.set_xlabel("")
-ax6.set_ylabel("")
+# ax6 = fig.add_subplot(3, 2, 6)
+# sm.qqplot(logeados2, stats.loglaplace(parametros_loglaplace2[0],
+#                                      parametros_loglaplace2[1],
+#                                      parametros_loglaplace2[2]),
+#           line = "45", ax = ax6)
+# ax6.set_title('loglaplace', size = 11.0)
+# ax6.set_xlabel("")
+# ax6.set_ylabel("")
 
-fig.tight_layout(pad=0.7)
+# fig.tight_layout(pad=0.7)
 
-fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
-fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
+# fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
+# fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
 
-fig.suptitle('Gráfico de cuantiles distribuciones para las colas')
-fig.subplots_adjust(top=0.86)
+# fig.suptitle('Gráfico de cuantiles distribuciones para las colas')
+# fig.subplots_adjust(top=0.86)
 
-plt.show()
+# plt.show()
 
 
 
@@ -300,88 +348,88 @@ def pp_plot(x, dist, line=True, ax=None):
 
 #%% 
 
-# rango_fechas = pd.date_range(datos['FechaRegistro'].values[0] - timedelta(days = 1), 
-#         end = datos['FechaRegistro'].values.max() + timedelta(days = 5) ).to_pydatetime().tolist()
+rango_fechas = pd.date_range(datos['FechaRegistro'][32] - timedelta(days = 13), 
+        end = datos['FechaRegistro'].max() + timedelta(days = 4) ).to_pydatetime().tolist()
 
 
-# fechas_vistas = np.array([datetime.strptime(str(x), 
-#                     "%Y-%m-%d %H:%M:%S") for x in datos.FechaRegistro ])
+fechas_vistas = np.array([datetime.strptime(str(x), 
+                    "%Y-%m-%d %H:%M:%S") for x in datos.FechaRegistro ])
 
 
-# conteo_dias = np.zeros(len(rango_fechas))
+conteo_dias = np.zeros(len(rango_fechas))
 
-# for i in range(0,len(rango_fechas)):
-#     conteo_dias[i] = sum(fechas_vistas == rango_fechas[i])
+for i in range(0,len(rango_fechas)):
+    conteo_dias[i] = sum(fechas_vistas == rango_fechas[i])
 
 
-# df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
+df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
 
 
 
 #%%
 
-# ## Parámetros obtenidos en R para la binomial negativa
-# n = len(conteo_dias)
-# mu = np.mean(conteo_dias)
-# v = (n - 1)/n * np.var(conteo_dias, ddof=1)
-# size = (mu**2/(v - mu))
-# prob = size/(size+mu)
+## Parámetros obtenidos en R para la binomial negativa
+n = len(conteo_dias)
+mu = np.mean(conteo_dias)
+v = (n - 1)/n * np.var(conteo_dias, ddof=1)
+size = (mu**2/(v - mu))
+prob = size/(size+mu)
 
 
-# q =  np.linspace(0.01,0.99,182)
-# cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
-# cuantil_observado = np.quantile(conteo_dias, q)
+q =  np.linspace(0.01,0.99,182)
+cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
+cuantil_observado = np.quantile(conteo_dias, q)
 
 
 
-# fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
 
-# sm.qqplot(conteo_dias, stats.nbinom(n = size, p = prob),
-#           loc = 0, scale = 1,
-#           line = "45", ax = ax1)
-# ax1.set_title("Cuantiles", fontsize=11)
-# ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
-# ax1.set_ylabel("Cuantiles observados", fontsize=8)
+sm.qqplot(conteo_dias, stats.nbinom(n = size, p = prob),
+          loc = 0, scale = 1,
+          line = "45", ax = ax1)
+ax1.set_title("Cuantiles", fontsize=11)
+ax1.set_xlabel('Cuantiles teóricos', fontsize=8)
+ax1.set_ylabel("Cuantiles observados", fontsize=8)
 
 
-# cdf_teorico = stats.nbinom.cdf(cuantil_teorico, n = size, p = prob)
-# ecdf = sm.distributions.ECDF(cuantil_observado)
+cdf_teorico = stats.nbinom.cdf(cuantil_teorico, n = size, p = prob)
+ecdf = sm.distributions.ECDF(cuantil_observado)
 
-# ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
-#          color = "red")
-# ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
-#             color = "blue",  label = "CDF observado")
-# ax2.set_title("Distribución acumulada", fontsize=11)
-# ax2.set_xlabel('Datos', fontsize=8)
-# ax2.set_ylabel("CDF", fontsize=8)
-# ax2.legend()
+ax2.step(cuantil_teorico, cdf_teorico, label = "CDF teórico",
+          color = "red")
+ax2.step(cuantil_teorico, ecdf(cuantil_teorico),
+            color = "blue",  label = "CDF observado")
+ax2.set_title("Distribución acumulada", fontsize=11)
+ax2.set_xlabel('Datos', fontsize=8)
+ax2.set_ylabel("CDF", fontsize=8)
+ax2.legend()
 
 
-# pp_plot(conteo_dias , stats.nbinom(n = size, p=prob) , ax = ax3)
-# ax3.set_title("Probabilidades", fontsize=11)
-# ax3.set_xlabel('Teóricas', fontsize=8)
-# ax3.set_ylabel("Observadas", fontsize=8)
+pp_plot(conteo_dias , stats.nbinom(n = size, p=prob) , ax = ax3)
+ax3.set_title("Probabilidades", fontsize=11)
+ax3.set_xlabel('Teóricas', fontsize=8)
+ax3.set_ylabel("Observadas", fontsize=8)
        
 
-# densidad_teorica = stats.nbinom.pmf(np.unique(conteo_dias), n = size, p = prob)
+densidad_teorica = stats.nbinom.pmf(np.unique(conteo_dias), n = size, p = prob)
 
-# ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
-#          label = "Observada")
-# ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
-#          label = "Teórica")
-# ax4.set_title("Densidad", fontsize=11)
-# ax4.set_xlabel('Datos', fontsize=8)
-# ax4.set_ylabel("Densidad", fontsize=8)
-# ax4.legend()    
+ax4.hist(data=df, x="Conteo", density=True, stacked = True, bins = 45,
+          label = "Observada")
+ax4.plot(np.unique(conteo_dias), densidad_teorica, color = "red",
+          label = "Teórica")
+ax4.set_title("Densidad", fontsize=11)
+ax4.set_xlabel('Datos', fontsize=8)
+ax4.set_ylabel("Densidad", fontsize=8)
+ax4.legend()    
 
 # fig.suptitle("Ajuste binomial negativa", fontsize=14)
-# fig.tight_layout(pad=0.9)
-# fig.subplots_adjust(top=0.85)
+fig.tight_layout(pad=0.9)
+fig.subplots_adjust(top=0.85)
 
-# # plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
+plt.savefig('P2.AjusBN.jpeg', format='jpeg', dpi=1300)
 
-# plt.show()
+plt.show()
 
 
 
@@ -403,11 +451,11 @@ frecuencias = np.concatenate((f,ceros))
 
 #%%
 
-logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-datos_sampleo = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
-f2 = Fitter(datos_sampleo,  distributions= 'genpareto')
-f2.fit()
-parametros_pareto2 =  f2.fitted_param['genpareto']
+# logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
+# datos_sampleo = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
+# f2 = Fitter(datos_sampleo,  distributions= 'genpareto')
+# f2.fit()
+# parametros_pareto2 =  f2.fitted_param['genpareto']
 
 
 
@@ -478,50 +526,50 @@ a = 0.99
 parametros_nbinom = np.array([12.93532,0.06113912])
 
     
-# vector de totales
-totales = np.zeros(m) 
+# # vector de totales
+# totales = np.zeros(m) 
 
-# Simulaciones
-# Se fija la semilla para obtener replicar los resultados 
-np.random.seed(100)
+# # Simulaciones
+# # Se fija la semilla para obtener replicar los resultados 
+# np.random.seed(100)
 
-# Genere vector de variables N_1 , ... , N_m
-Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
-                               p = parametros_nbinom[1],
-                               loc = 0, size = m)
+# # Genere vector de variables N_1 , ... , N_m
+# Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
+#                                p = parametros_nbinom[1],
+#                                loc = 0, size = m)
 
-#maximos = np.zeros(m) 
-#no_empiricas = np.zeros(m) 
-for j in range(0,m):
-    # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
-    Uniformes = np.random.uniform(size = Frecuencias[j])
-    # Vector de reclamaciones
-    Reclamaciones = np.zeros(Frecuencias[j])
+# #maximos = np.zeros(m) 
+# #no_empiricas = np.zeros(m) 
+# for j in range(0,m):
+#     # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
+#     Uniformes = np.random.uniform(size = Frecuencias[j])
+#     # Vector de reclamaciones
+#     Reclamaciones = np.zeros(Frecuencias[j])
     
-    # Reclamaciones con distribución empírica
-    empirica = Uniformes < q
+#     # Reclamaciones con distribución empírica
+#     empirica = Uniformes < q
     
-    # Sampleo reclamaciones según distribución empírica
-    Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
-    # Sampleo reclamaciones según distribución generalizada de pareto
-    Reclamaciones[~ empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
-                        loc = parametros_pareto2[1], scale = parametros_pareto2[2],
-                        size = sum(Uniformes > q))
+#     # Sampleo reclamaciones según distribución empírica
+#     Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
+#     # Sampleo reclamaciones según distribución generalizada de pareto
+#     Reclamaciones[~ empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
+#                         loc = parametros_pareto2[1], scale = parametros_pareto2[2],
+#                         size = sum(Uniformes > q))
     
-    # Se guardan la suma de las reclamaciones
-    # Elimina el efecto de los logarítmos
-    totales[j] = sum(Reclamaciones)
+#     # Se guardan la suma de las reclamaciones
+#     # Elimina el efecto de los logarítmos
+#     totales[j] = sum(Reclamaciones)
 
-# Var 99
-VaR_mle = np.quantile(totales, q = a)
+# # Var 99
+# VaR_mle = np.quantile(totales, q = a)
 
-# ES 99
-ES_mle =  np.mean(totales[totales > VaR_mle])
+# # ES 99
+# ES_mle =  np.mean(totales[totales > VaR_mle])
 
 
 #%%
 
-#Simulaciones sin valor extremo usando MLE genpareto
+#Simulaciones sin valor extremo usando MLE dgamma
 
 # m: numero de simulaciones
 m = 10000
@@ -546,9 +594,9 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
 for j in range(0,m):
     # Vector de reclamaciones
     
-    Reclamaciones = stats.genpareto.rvs(parametros_genpareto[0],
-                                         parametros_genpareto[1],
-                                         parametros_genpareto[2],
+    Reclamaciones = stats.dgamma.rvs(parametros_dgamma[0],
+                                         parametros_dgamma[1],
+                                         parametros_dgamma[2],
                                          size = Frecuencias[j])
     # Elimina el efecto de los logarítmos
     totales[j] = sum(np.exp(Reclamaciones))
@@ -631,51 +679,51 @@ size = size*365
 
 parametros_nbinom = np.array([size,prob])
 
-# vector de totales
-totales = np.zeros(m) 
+# # vector de totales
+# totales = np.zeros(m) 
 
-# Simulaciones
-# Se fija la semilla para obtener replicar los resultados 
-np.random.seed(100)
+# # Simulaciones
+# # Se fija la semilla para obtener replicar los resultados 
+# np.random.seed(100)
 
-# Genere vector de variables N_1 , ... , N_m
-Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
-                               p = parametros_nbinom[1],
-                               loc = 0, size = m)
+# # Genere vector de variables N_1 , ... , N_m
+# Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] , 
+#                                p = parametros_nbinom[1],
+#                                loc = 0, size = m)
 
-#maximos = np.zeros(m) 
-#no_empiricas = np.zeros(m) 
-for j in range(0,m):
-    # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
-    Uniformes = np.random.uniform(size = Frecuencias[j])
-    # Vector de reclamaciones
-    Reclamaciones = np.zeros(Frecuencias[j])
+# #maximos = np.zeros(m) 
+# #no_empiricas = np.zeros(m) 
+# for j in range(0,m):
+#     # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
+#     Uniformes = np.random.uniform(size = Frecuencias[j])
+#     # Vector de reclamaciones
+#     Reclamaciones = np.zeros(Frecuencias[j])
     
-    # Reclamaciones con distribución empírica
-    empirica = Uniformes < q
+#     # Reclamaciones con distribución empírica
+#     empirica = Uniformes < q
     
-    # Sampleo reclamaciones según distribución empírica
-    Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
-    # Sampleo reclamaciones según distribución generalizada de pareto
-    Reclamaciones[~ empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
-                        loc = parametros_pareto2[1], scale = parametros_pareto2[2],
-                        size = sum(Uniformes > q))
+#     # Sampleo reclamaciones según distribución empírica
+#     Reclamaciones[empirica] = sampleo_distr_empirica(sum(empirica))
+#     # Sampleo reclamaciones según distribución generalizada de pareto
+#     Reclamaciones[~ empirica] = stats.genpareto.rvs(c = parametros_pareto2[0],
+#                         loc = parametros_pareto2[1], scale = parametros_pareto2[2],
+#                         size = sum(Uniformes > q))
     
-    # Se guardan la suma de las reclamaciones
-    # Elimina el efecto de los logarítmos
-    totales[j] = sum(Reclamaciones)
+#     # Se guardan la suma de las reclamaciones
+#     # Elimina el efecto de los logarítmos
+#     totales[j] = sum(Reclamaciones)
 
-# Var 99
-VaR_mme = np.quantile(totales, q = a)
+# # Var 99
+# VaR_mme = np.quantile(totales, q = a)
 
-# ES 99
-ES_mme =  np.mean(totales[totales > VaR_mme])
+# # ES 99
+# ES_mme =  np.mean(totales[totales > VaR_mme])
 
 
 
 #%%
 
-#Simulaciones sin valor extremo usando MME genpareto
+#Simulaciones sin valor extremo usando MME dgamma
 
 # m: numero de simulaciones
 m = 10000
@@ -700,9 +748,9 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
 for j in range(0,m):
     # Vector de reclamaciones
     
-    Reclamaciones = stats.genpareto.rvs(parametros_genpareto[0],
-                                         parametros_genpareto[1],
-                                         parametros_genpareto[2],
+    Reclamaciones = stats.dgamma.rvs(parametros_dgamma[0],
+                                         parametros_dgamma[1],
+                                         parametros_dgamma[2],
                                          size = Frecuencias[j])
     # Elimina el efecto de los logarítmos
     totales[j] = sum(np.exp(Reclamaciones))
@@ -778,9 +826,9 @@ ES_mme2 =  np.mean(totales[totales > VaR_mme2])
 # meantotales_mle = 51148650.034233436
 # meanFrecuencias_mle = 198.5175
 
-# VaR_mle1 = 160464392.15579706
-# ES_mle1 = 174251468.33023345
-# meantotales_mle1 = 88451194.13590004
+# VaR_mle1 = 289878269.0613771
+# ES_mle1 = 702937098.7865602
+# meantotales_mle1 = 65641570.00784317
 # meanFrecuencias_mle1 = 198.5175
 
 # VaR_mle2 = 177194060.5848579
@@ -792,14 +840,14 @@ ES_mme2 =  np.mean(totales[totales > VaR_mme2])
 
 
 # MME
-# VaR_mme = 82601382.65945648
-# ES_mme = 88113997.46836632
+# VaR_mme = 241077842.4762996
+# ES_mme = 709443089.5255039
 # meantotales_mme = 51103563.271025755
 # meanFrecuencias_mme = 198.6176
 
 # VaR_mme1 = 141645018.20575505
 # ES_mme1 = 151332443.37369093
-# meantotales_mme1 = 88495392.01280227
+# meantotales_mme1 = 64864278.90660713
 # meanFrecuencias_mme1 = 198.6176 
 
 # VaR_mme2 = 166360608.36285147
