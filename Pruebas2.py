@@ -300,8 +300,8 @@ def pp_plot(x, dist, line=True, ax=None):
 
 #%% 
 
-# rango_fechas = pd.date_range(datos['FechaRegistro'][0] - timedelta(days = 1), 
-#         end = datos['FechaRegistro'].max() + timedelta(days = 5) ).to_pydatetime().tolist()
+# rango_fechas = pd.date_range(datos['FechaRegistro'].values[0] - timedelta(days = 1), 
+#         end = datos['FechaRegistro'].values.max() + timedelta(days = 5) ).to_pydatetime().tolist()
 
 
 # fechas_vistas = np.array([datetime.strptime(str(x), 
