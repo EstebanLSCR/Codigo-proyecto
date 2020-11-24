@@ -59,10 +59,11 @@ plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
 plt.legend()
 
 
-plt.title("Ajuste de densidades para las reclamaciones")
+# plt.title("Ajuste de densidades para las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
 
+plt.savefig('C.DenRec.jpeg', format='jpeg', dpi=1300)
 
 # Para salvar imagen
 ## plt.savefig('Prueba.svg', format='svg', dpi=1200)
@@ -77,7 +78,7 @@ plt.ylabel('Densidad')
 ## Gráfico de cuantiles
 
 parametros_pareto = stats.genpareto.fit(logeados, loc = 2 )
-parametros_normal = f.fitted_param['gennorm']
+parametros_gennormal = f.fitted_param['gennorm']
 parametros_weibull = f.fitted_param['dweibull']
 parametros_gamma = f.fitted_param['gamma']
 
@@ -85,9 +86,9 @@ fig = plt.figure(dpi = 1300)
 
 ax = fig.add_subplot(2, 2, 1)
 sm.qqplot(logeados, stats.gennorm, 
-          distargs= (parametros_normal[0],) , 
-          loc = parametros_normal[1], 
-          scale = parametros_normal[2],
+          distargs= (parametros_gennormal[0],) , 
+          loc = parametros_gennormal[1], 
+          scale = parametros_gennormal[2],
           line = "45", ax = ax)
 ax.set_title('Normal generalizada', size = 11.0)
 ax.set_xlabel("")
@@ -131,8 +132,9 @@ fig.tight_layout(pad=0.7)
 fig.text(0.5, 0, 'Cuantiles teóricos', ha='center', va='center')
 fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='vertical')
 
-fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
+# fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
 fig.subplots_adjust(top=0.86)
+plt.savefig('C.QQDist.jpeg', format='jpeg', dpi=1300)
 plt.show()
 
 #%%
@@ -172,9 +174,9 @@ fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2,
                                           dpi=1300)
 
 
-pp_plot(logeados, stats.gennorm(beta = parametros_normal[0], 
-                                loc = parametros_normal[1],
-                                scale=parametros_normal[2]), 
+pp_plot(logeados, stats.gennorm(beta = parametros_gennormal[0], 
+                                loc = parametros_gennormal[1],
+                                scale=parametros_gennormal[2]), 
         line = True, ax=ax1)
 
 ax1.set_title('Normal generalizada', fontsize=11)
@@ -203,34 +205,11 @@ fig.tight_layout(pad=0.7)
 fig.text(0.5, 0, 'Probabilidades teóricas', ha='center', va='center')
 fig.text(0., 0.5, 'Probabilidades observadas', ha='center', va='center', rotation='vertical')
 
-fig.suptitle('Gráfico de probabilidades observadas vs teóricas')
+# fig.suptitle('Gráfico de probabilidades observadas vs teóricas')
 fig.subplots_adjust(top=0.86)
+plt.savefig('C.PPDist.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
-
-#%%
-
-# fechas = np.array([datetime.datetime.strptime(str(datos.FechaDescubrimiento[0]), 
-#                                "%Y-%m-%d %H:%M:%S") ])
-
-# for i in range(1, len(datos.FechaDescubrimiento)):
-#     temp = datetime.datetime.strptime(str(datos.FechaDescubrimiento[i]), 
-#                                "%Y-%m-%d %H:%M:%S")
-#     fechas = np.append(fechas, temp)
-
-# meses = [x.month-1 for x in fechas]
-
-#df=datos.loc[:,["MontoHistorico","frecuenciaO"]]
-#df["BigFrec"]=df["frecuenciaO"]>30
-#observados=pd.crosstab(index=df['BigFrec'],columns=df['MontoHistorico'],margins=True)
-
-#res = stat()
-
-#res.chisq(df=datos)
-
-#Prueba chi cuadrado
-#vec=(F_frecuencias(datos,"O"))
-#chisquare(vec)
 
 
 #%%
@@ -243,23 +222,23 @@ logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
 
 
 f2 = Fitter(logeados2,  
-           distributions= ['gamma', 'dweibull',
-                           'gennorm'])
+           distributions= ['gamma', 'dweibull','gennorm'])
 f2.fit()
 
-plt.title("Histograma de meses de descubrimiento")
-plt.xlabel('Mes')
-plt.ylabel('Conteo') 
+# plt.title("Histograma de meses de descubrimiento")
+# plt.xlabel('Mes')
+# plt.ylabel('Conteo') 
 
 
-#parametros_pareto2 = stats.genpareto.fit(logeados2, loc = np.exp(15) )
 
-#f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
- #               c = parametros_pareto2[0], 
-  #              loc = parametros_pareto2[1], 
-   #             scale = parametros_pareto2[2])
+# parametros_pareto2 = stats.genpareto.fit(logeados2, loc = np.exp(15) )
 
-parametros_normal2 = f2.fitted_param['gennorm']
+# f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
+#                 c = parametros_pareto2[0], 
+#                 loc = parametros_pareto2[1], 
+#                 scale = parametros_pareto2[2])
+
+parametros_gennormal2 = f2.fitted_param['gennorm']
 parametros_weibull2 = f2.fitted_param['dweibull']
 parametros_gamma2 = f2.fitted_param['gamma']
 #parametros_pareto2 = f2.fitted_param['genpareto']
@@ -787,94 +766,104 @@ for j in range(0,m):
     totales[j] = sum(np.exp(Reclamaciones))
 
 
-#%%
-#from rpy2.robjects.packages import importr
-# import R's "base" package
-
-import rpy2.robjects.packages as rpackages
-
-# import R's utility package
-utils = rpackages.importr('utils')
-
-# select a mirror for R packages
-utils.chooseCRANmirror(ind=1)
-
-packnames = ('fitdistrplus', 'MASS')
-
-# R vector of strings
-from rpy2.robjects.vectors import StrVector
-
-# Selectively install what needs to be install.
-# We are fancy, just because we can.
-names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
-if len(names_to_install) > 0:
-    utils.install_packages(StrVector(names_to_install))
 
 
-#%%
-import rpy2.robjects as robjects
-from rpy2.robjects.packages import importr
-# import R's "base" package
-fitdistrplus = importr('fitdistrplus')
-MASS = importr('MASS')
-Stats = importr('stats')
 
-ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(conteo_dias),
-                                     "nbinom", "mle")
+
 
 
 
 
 
 #%%
+# #from rpy2.robjects.packages import importr
+# # import R's "base" package
 
-q =  np.linspace(0.01,0.99,182)
-cuantil_observado = np.quantile(np.exp(logeados), q)
-ecdf = sm.distributions.ECDF(cuantil_observado)
+# import rpy2.robjects.packages as rpackages
 
-for j in range(0, len(li_recla)):
-    cuantil_observado2 = np.quantile(li_recla[j] ,q)
-    ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
+# # import R's utility package
+# utils = rpackages.importr('utils')
 
-    plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
-         color = "red")
+# # select a mirror for R packages
+# utils.chooseCRANmirror(ind=1)
+
+# packnames = ('fitdistrplus', 'MASS')
+
+# # R vector of strings
+# from rpy2.robjects.vectors import StrVector
+
+# # Selectively install what needs to be install.
+# # We are fancy, just because we can.
+# names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
+# if len(names_to_install) > 0:
+#     utils.install_packages(StrVector(names_to_install))
 
 
-plt.plot(cuantil_observado, ecdf(cuantil_observado),
-         color = "blue", label = "CDF observado")
 
-plt.title("Distribución acumulada", fontsize=11)
-plt.xlabel('Datos', fontsize=8)
-plt.ylabel("CDF", fontsize=8)
-plt.legend()
+#%%
+# import rpy2.robjects as robjects
+# from rpy2.robjects.packages import importr
+# # import R's "base" package
+# fitdistrplus = importr('fitdistrplus')
+# MASS = importr('MASS')
+# Stats = importr('stats')
 
-plt.show()
+# ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(conteo_dias),
+#                                      "nbinom", "mle")
+
+
+
 
 
 #%%
 
-q =  np.linspace(0.01,0.99,182)
-cuantil_observado = np.quantile(logeados, q)
-ecdf = sm.distributions.ECDF(cuantil_observado)
+# q =  np.linspace(0.01,0.99,182)
+# cuantil_observado = np.quantile(np.exp(logeados), q)
+# ecdf = sm.distributions.ECDF(cuantil_observado)
+
+# for j in range(0, len(li_recla)):
+#     cuantil_observado2 = np.quantile(li_recla[j] ,q)
+#     ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
+
+#     plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
+#          color = "red")
 
 
-for j in range(0, len(li_recla)):
-    cuantil_observado2 = np.quantile(li_recla[j] ,q)
-    ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
+# plt.plot(cuantil_observado, ecdf(cuantil_observado),
+#          color = "blue", label = "CDF observado")
 
-    plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
-         color = "red")
+# plt.title("Distribución acumulada", fontsize=11)
+# plt.xlabel('Datos', fontsize=8)
+# plt.ylabel("CDF", fontsize=8)
+# plt.legend()
+
+# plt.show()
 
 
-plt.plot(cuantil_observado, ecdf(cuantil_observado),
-         color = "blue", label = "CDF observado")
+#%%
 
-plt.title("Distribución acumulada", fontsize=11)
-plt.xlabel('Datos', fontsize=8)
-plt.ylabel("CDF", fontsize=8)
-plt.legend()
+# q =  np.linspace(0.01,0.99,182)
+# cuantil_observado = np.quantile(logeados, q)
+# ecdf = sm.distributions.ECDF(cuantil_observado)
 
-plt.show()
+
+# for j in range(0, len(li_recla)):
+#     cuantil_observado2 = np.quantile(li_recla[j] ,q)
+#     ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
+
+#     plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
+#          color = "red")
+
+
+# plt.plot(cuantil_observado, ecdf(cuantil_observado),
+#          color = "blue", label = "CDF observado")
+
+# plt.title("Distribución acumulada", fontsize=11)
+# plt.xlabel('Datos', fontsize=8)
+# plt.ylabel("CDF", fontsize=8)
+# plt.legend()
+
+# plt.show()
 
 
 

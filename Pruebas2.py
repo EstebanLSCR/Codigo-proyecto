@@ -185,7 +185,7 @@ fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='ve
 
 # fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
 fig.subplots_adjust(top=0.86)
-plt.savefig('P2.QQDist.jpeg', format='jpeg', dpi=1300)
+# plt.savefig('P2.QQDist.jpeg', format='jpeg', dpi=1300)
 plt.show()
 
 

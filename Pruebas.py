@@ -39,7 +39,7 @@ datos = datos[datos.TipoEvento=="Tarjetas de débito"]
 # logeados = np.log(datos.MontoHistorico)
 
 # f = Fitter(logeados, 
-#            distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
+#             distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
 
 # f.fit()
 # f.summary()
@@ -78,7 +78,7 @@ plt.savefig('P1.DenRec.jpeg', format='jpeg', dpi=1300)
 
 #%%
 
-## Gráfico de cuantiles
+# # Gráfico de cuantiles
 
 # parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
 # parametros_dgamma = f.fitted_param['dgamma']
@@ -91,8 +91,8 @@ plt.savefig('P1.DenRec.jpeg', format='jpeg', dpi=1300)
 
 # ax1 = fig.add_subplot(3, 2, 1)
 # sm.qqplot(logeados, stats.dgamma(parametros_dgamma[0], 
-#                                  loc = parametros_dgamma[1], 
-#                                  scale = parametros_dgamma[2]),
+#                                   loc = parametros_dgamma[1], 
+#                                   scale = parametros_dgamma[2]),
 #           line = "45", ax = ax1)
 # ax1.set_title('dgamma', size = 11.0)
 # ax1.set_xlabel("")
@@ -119,9 +119,9 @@ plt.savefig('P1.DenRec.jpeg', format='jpeg', dpi=1300)
 
 # ax4 = fig.add_subplot(3, 2, 4)
 # sm.qqplot(logeados, stats.mielke(parametros_mielke[0],
-#                                  parametros_mielke[1],
-#                                  loc = parametros_mielke[2], 
-#                                  scale = parametros_mielke[3]),
+#                                   parametros_mielke[1],
+#                                   loc = parametros_mielke[2], 
+#                                   scale = parametros_mielke[3]),
 #           line = "45", ax = ax4)
 # ax4.set_title('mielke', size = 11.0)
 # ax4.set_xlabel("")
@@ -129,9 +129,9 @@ plt.savefig('P1.DenRec.jpeg', format='jpeg', dpi=1300)
 
 # ax5 = fig.add_subplot(3, 2, 5)
 # sm.qqplot(logeados, stats.burr(parametros_burr[0],
-#                                parametros_burr[1],
-#                                loc = parametros_burr[2], 
-#                                scale = parametros_burr[3]),
+#                                 parametros_burr[1],
+#                                 loc = parametros_burr[2], 
+#                                 scale = parametros_burr[3]),
 #           line = "45", ax = ax5)
 # ax5.set_title('burr', size = 11.0)
 # ax5.set_xlabel("")
@@ -189,7 +189,7 @@ fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='ve
 
 # fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
 fig.subplots_adjust(top=0.86)
-plt.savefig('P1.QQDist.jpeg', format='jpeg', dpi=1300)
+# plt.savefig('P1.QQDist.png', format='png', dpi=1300)
 plt.show()
 
 
@@ -250,14 +250,14 @@ stats.kstest(logeados, "burr", args=(parametros_burr))
 
 #%%
 
-## Gráfico de cuantiles cola
+# # Gráfico de cuantiles cola
 
 # fig = plt.figure(dpi = 1300)
 
 # ax1 = fig.add_subplot(3, 2, 1)
 # sm.qqplot(logeados2, stats.dgamma(parametros_dgamma2[0], 
-#                                  loc = parametros_dgamma2[1], 
-#                                  scale = parametros_dgamma2[2]),
+#                                   loc = parametros_dgamma2[1], 
+#                                   scale = parametros_dgamma2[2]),
 #           line = "45", ax = ax1)
 # ax1.set_title('dgamma', size = 11.0)
 # ax1.set_xlabel("")
@@ -283,9 +283,9 @@ stats.kstest(logeados, "burr", args=(parametros_burr))
 
 # ax4 = fig.add_subplot(3, 2, 4)
 # sm.qqplot(logeados2, stats.mielke(parametros_mielke2[0],
-#                                  parametros_mielke2[1],
-#                                  loc = parametros_mielke2[2], 
-#                                  scale = parametros_mielke2[3]),
+#                                   parametros_mielke2[1],
+#                                   loc = parametros_mielke2[2], 
+#                                   scale = parametros_mielke2[3]),
 #           line = "45", ax = ax4)
 # ax4.set_title('mielke', size = 11.0)
 # ax4.set_xlabel("")
@@ -303,7 +303,7 @@ stats.kstest(logeados, "burr", args=(parametros_burr))
 
 # ax6 = fig.add_subplot(3, 2, 6)
 # sm.qqplot(logeados2, stats.hypsecant(parametros_hypsecant2[0],
-#                                      parametros_hypsecant2 [1]),
+#                                       parametros_hypsecant2 [1]),
 #           line = "45", ax = ax6)
 # ax6.set_title('hypsecant', size = 11.0)
 # ax6.set_xlabel("")

@@ -186,7 +186,7 @@ fig.text(0., 0.5, 'Cuantiles observados', ha='center', va='center', rotation='ve
 
 # fig.suptitle('Gráfico de cuantiles distribuciones ajustadas')
 fig.subplots_adjust(top=0.86)
-plt.savefig('P3.QQDist.jpeg', format='jpeg', dpi=1300)
+# plt.savefig('P3.QQDist.jpeg', format='jpeg', dpi=1300)
 plt.show()
 
 
@@ -835,7 +835,6 @@ ES_mme2 =  np.mean(totales[totales > VaR_mme2])
 # meantotales_mle1 = 840185466.745344
 # meanFrecuencias_mle1 = 176.5642
 
-# genlogistic
 # VaR_mle2 = 3920777753.0751286
 # ES_mle2 = 12282778967.692156
 # meantotales_mle2 = 551246064.907637
@@ -854,7 +853,6 @@ ES_mme2 =  np.mean(totales[totales > VaR_mme2])
 # meantotales_mme1 = 840262569.896537
 # meanFrecuencias_mme1 = 176.6153
 
-# genlogistic
 # VaR_mme2 = 3828339425.791828
 # ES_mme2 = 12303655802.236513
 # meantotales_mme2 = 551326580.5164571
