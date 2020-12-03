@@ -36,28 +36,28 @@ datos = datos[datos.TipoEvento=="Tarjetas de débito"]
 
 #%%
 
-# logeados = np.log(datos.MontoHistorico)
+logeados = np.log(datos.MontoHistorico)
 
-# f = Fitter(logeados, 
-#             distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
+f = Fitter(logeados, 
+            distributions=['dgamma','dweibull','mielke','burr','hypsecant'])
 
-# f.fit()
-# f.summary()
+f.fit()
+f.summary()
 
-# parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
+parametros_genpareto = stats.genpareto.fit(logeados, loc = 2 )
 
-# f_pareto =  stats.genpareto.pdf(np.sort(logeados), 
-#                 c = parametros_genpareto[0], 
-#                 loc = parametros_genpareto[1], 
-#                 scale = parametros_genpareto[2])
+f_pareto =  stats.genpareto.pdf(np.sort(logeados), 
+                c = parametros_genpareto[0], 
+                loc = parametros_genpareto[1], 
+                scale = parametros_genpareto[2])
 
 
-# plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
-# plt.legend()
+plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
+plt.legend()
 
-# plt.title("Ajuste de densidades para las reclamaciones")
-# plt.xlabel('Reclamos transformación logarítmica')
-# plt.ylabel('Densidad') 
+plt.title("Ajuste de densidades para las reclamaciones")
+plt.xlabel('Reclamos transformación logarítmica')
+plt.ylabel('Densidad') 
 
 
 

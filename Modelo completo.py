@@ -8,7 +8,11 @@ Created on Tue Oct 27 06:50:33 2020
 """
 
 
-# Código proyecto de riesgo
+# Código proyecto de riesgo para modelo completo sin filtrar las reclamaciones por tipo
+# Se requiere software R para correr y se requiere que R esté en el path de la computadora
+# Se requiere que el archivo "Defraudaciones enero-junio 2020.xlsx" esté en el mismo directorio
+# Par ejecutar el script dar clic en la flecha verde de arriba que se llama "Ejecutar archivo"
+# El script dura varios minutos para completar
 
 #%%
 
@@ -20,33 +24,53 @@ import matplotlib.pyplot as plt
 from fitter import Fitter
 import statsmodels.api as sm
 from datetime import datetime, timedelta
-# from datetime import timedelta
-# from scipy.stats import chisquare
-# import datetime
 import seaborn as sns
 import locale
+# Paquetes de R
+import rpy2.robjects.packages as rpackages
+import rpy2.robjects as robjects
+from rpy2.robjects.packages import importr
+from rpy2.robjects.vectors import StrVector
+
+# Instalando paquetes de R que se usaran
+utils = rpackages.importr('utils')
+
+# Mirror para la instalación de paquetes
+utils.chooseCRANmirror(ind=1)
+
+packnames = ('fitdistrplus', 'MASS')
+
+# Instalar paquetes que no están instalados
+names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
+if len(names_to_install) > 0:
+    utils.install_packages(StrVector(names_to_install))
+
 
 datos = pd.read_excel("Defraudaciones enero-junio 2020.xlsx")
 
 #%%
 
-# Histograma
+# Transformación logarítmica
+logeados = np.log(datos.MontoHistorico)
 
-plt.hist(datos['MontoHistorico'])
+#Histograma de las reclamaciones 
+fig = plt.figure()
+
+plt.hist(logeados )
 plt.title("Histograma para las reclamaciones")
-plt.xlabel('Reclamos')
+plt.xlabel('Reclamos con transformación logarítmica')
 plt.ylabel('Conteo') 
 
+plt.show()
 
-#%%
-
-logeados = np.log(datos.MontoHistorico)
+#%% Ajuste de las distribuciones gamma, doble weibull y normal generalizada
 
 f = Fitter(logeados, distributions= ['gamma', 'dweibull', 'gennorm'])
 
 f.fit()
 f.summary()
 
+## Ajuste de la distribución pareto generalizada
 parametros_pareto = stats.genpareto.fit(logeados, loc = 2 )
 
 f_pareto =  stats.genpareto.pdf(np.sort(logeados), 
@@ -54,6 +78,7 @@ f_pareto =  stats.genpareto.pdf(np.sort(logeados),
                 loc = parametros_pareto[1], 
                 scale = parametros_pareto[2])
 
+### Gráfico de densidades
 
 plt.plot(np.sort(logeados), f_pareto, color = "purple", label = "genpareto")
 plt.legend()
@@ -63,27 +88,28 @@ plt.title("Ajuste de densidades para las reclamaciones")
 plt.xlabel('Reclamos transformación logarítmica')
 plt.ylabel('Densidad') 
 
-plt.savefig('C.DenRec.jpeg', format='jpeg', dpi=1300)
-
+plt.show()
 
 
 
 #%%
 
-## Gráfico de cuantiles
-
+# Se obtienen los parámetros de las distribuciones
 parametros_pareto = stats.genpareto.fit(logeados, loc = 2 )
-parametros_gennormal = f.fitted_param['gennorm']
+parametros_normal = f.fitted_param['gennorm']
 parametros_weibull = f.fitted_param['dweibull']
 parametros_gamma = f.fitted_param['gamma']
 
-fig = plt.figure(dpi = 1300)
+
+## Gráfico de cuantiles para las distribuciones ajustadas
+
+fig = plt.figure()
 
 ax = fig.add_subplot(2, 2, 1)
 sm.qqplot(logeados, stats.gennorm, 
-          distargs= (parametros_gennormal[0],) , 
-          loc = parametros_gennormal[1], 
-          scale = parametros_gennormal[2],
+          distargs= (parametros_normal[0],) , 
+          loc = parametros_normal[1], 
+          scale = parametros_normal[2],
           line = "45", ax = ax)
 ax.set_title('Normal generalizada', size = 11.0)
 ax.set_xlabel("")
@@ -133,9 +159,7 @@ plt.show()
 
 #%%
 
-## Gráfico pp distribución completa
-
-
+## Función para calcular los gráficos de probabilidades empíricas vs teóricas
 def pp_plot(x, dist, line=True, ax=None):
     '''
     Function for comparing empirical data to a theoretical distribution by using a P-P plot.
@@ -163,14 +187,15 @@ def pp_plot(x, dist, line=True, ax=None):
     return ax
 
 
+## Gráfico pp distribución completa
 
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2, 
                                           dpi=1300)
 
 
-pp_plot(logeados, stats.gennorm(beta = parametros_gennormal[0], 
-                                loc = parametros_gennormal[1],
-                                scale=parametros_gennormal[2]), 
+pp_plot(logeados, stats.gennorm(beta = parametros_normal[0], 
+                                loc = parametros_normal[1],
+                                scale=parametros_normal[2]), 
         line = True, ax=ax1)
 
 ax1.set_title('Normal generalizada', fontsize=11)
@@ -201,98 +226,51 @@ fig.text(0., 0.5, 'Probabilidades observadas', ha='center', va='center', rotatio
 
 fig.suptitle('Gráfico de probabilidades observadas vs teóricas')
 fig.subplots_adjust(top=0.86)
+
 plt.show()
 
 
 #%%
 
 #Corte para valor extremo
+# q = 0.95
 
 logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-# logeados2 = np.exp(logeados2)
-# logeados2 = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
 
+parametros_pareto2 = stats.genpareto.fit(np.exp(logeados2))
+parametros_gamma2 =  stats.gamma.fit(np.exp(logeados2))
 
-f2 = Fitter(logeados2,  
-           distributions= ['gamma', 'dweibull','gennorm'])
-f2.fit()
-
-# plt.title("Histograma de meses de descubrimiento")
-# plt.xlabel('Mes')
-# plt.ylabel('Conteo') 
-
-
-
-# parametros_pareto2 = stats.genpareto.fit(logeados2, loc = np.exp(15) )
-
-# f_pareto =  stats.genpareto.pdf(np.sort(logeados2), 
-#                 c = parametros_pareto2[0], 
-#                 loc = parametros_pareto2[1], 
-#                 scale = parametros_pareto2[2])
-
-parametros_gennormal2 = f2.fitted_param['gennorm']
-parametros_weibull2 = f2.fitted_param['dweibull']
-parametros_gamma2 = f2.fitted_param['gamma']
-#parametros_pareto2 = f2.fitted_param['genpareto']
-
-f2.summary()
-#plt.plot(np.sort(logeados2), f_pareto, color = "purple", label = "genpareto")
-#plt.legend()
-
-
-plt.title("Ajuste de densidades para la cola de las reclamaciones")
-plt.xlabel('Reclamos transformación logarítmica')
-plt.ylabel('Densidad') 
-
-#plt.savefig('Densidad_cola.jpeg', format='jpeg', dpi=1300)
-
-plt.show()
-
-#%%
-
-#logeados2 = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
-logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-
-parametros_pareto2 = stats.genpareto.fit(logeados2, loc = 15)
-parametros_gamma2 =  stats.gamma.fit(logeados2)
-
-parametros_genextrme = stats.genextreme.fit(logeados2)
-
+parametros_gennorm = stats.gennorm.fit(np.exp(logeados2))
+parametros_weibull2 = stats.dweibull.fit(np.exp(logeados) )
 
 
 #%%
 
-## Gráfico de cuantiles cola
+## Gráfico de cuantiles para el ajuste de la cola
 
 fig = plt.figure()
 
 ax = fig.add_subplot(2, 2, 1)
-sm.qqplot(logeados2, stats.genextreme, 
-          distargs= (parametros_genextrme[0],) , 
-          loc = parametros_genextrme[1], 
-          scale = parametros_genextrme[2],
+sm.qqplot(np.exp(logeados2), stats.gennorm, 
+          distargs= (parametros_gennorm[0],) , 
+          loc = parametros_gennorm[1], 
+          scale = parametros_gennorm[2],
           line = "45", ax = ax)
-ax.set_title('Extrema generalizada', size = 11.0)
+ax.set_title('Normal generalizada', size = 11.0)
 ax.set_xlabel("")
 ax.set_ylabel("")
-#ax.set_xlim([12, 17])
-#ax.set_ylim([12, 17])
-
 
 ax2 = fig.add_subplot(2, 2, 2)
-sm.qqplot(logeados2, stats.genpareto(c =parametros_pareto2[0],
+sm.qqplot(np.exp(logeados2), stats.genpareto(c =parametros_pareto2[0],
                                      loc = parametros_pareto2[1],
                                      scale = parametros_pareto2[2]), 
           line = "45",ax = ax2)
 ax2.set_title("Pareto generalizada", size = 11.0)
 ax2.set_xlabel("")
 ax2.set_ylabel("")
-#ax2.set_xlim([12, 20])
-#ax2.set_ylim([-0.1e10, 2e10])
-
 
 ax3 = fig.add_subplot(2, 2, 3)
-sm.qqplot(logeados2, stats.dweibull, 
+sm.qqplot(np.exp(logeados2), stats.dweibull, 
           distargs= (parametros_weibull2[0],) ,
           loc = parametros_weibull2[1], 
           scale = parametros_weibull2[2],
@@ -300,12 +278,9 @@ sm.qqplot(logeados2, stats.dweibull,
 ax3.set_title('Weibull doble', size = 11.0)
 ax3.set_xlabel("")
 ax3.set_ylabel("")
-#ax3.set_xlim([12, 20])
-#ax3.set_ylim([12, 20])
-
 
 ax4 = fig.add_subplot(2, 2, 4)
-sm.qqplot(logeados2, stats.gamma, 
+sm.qqplot(np.exp(logeados2), stats.gamma, 
         distargs= (parametros_gamma2[0],) ,
         loc = parametros_gamma2[1], 
         scale = parametros_gamma2[2],
@@ -313,8 +288,6 @@ sm.qqplot(logeados2, stats.gamma,
 ax4.set_title('Gamma', size = 11.0)
 ax4.set_xlabel("")
 ax4.set_ylabel("")
-#ax4.set_xlim([12, 20])
-#ax4.set_ylim([12, 20])
 
 fig.tight_layout(pad=0.7)
 
@@ -328,55 +301,12 @@ plt.show()
 
 
 
-#%% Gráficos ajuste cola
+#%% Pruebas KS del ajuste de colas 
 
-
-
-
-
-#%%
-mes = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-        "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"]
-
-fechas = np.array([datetime.strptime(str(datos.FechaRegistro[0]), "%Y-%m-%d %H:%M:%S") ])
-for i in range(1, len(datos.FechaRegistro)):
-    temp = datetime.strptime(str(datos.FechaRegistro[i]), "%Y-%m-%d %H:%M:%S")
-    fechas = np.append(fechas, temp)
-
-meses = [mes[x.month-1] for x in fechas]
-
-
-
-#%%
-
-sns.countplot(meses)
-plt.title("Histograma de meses de registro")
-plt.xlabel('Meses')
-plt.ylabel('Conteo') 
-
-plt.savefig('Conteo_meses_registro.jpeg', format='jpeg', dpi=1300)
-            
-
-#%% Frecuencias
-
-fechas = datos.FechaRegistro
-inicio = datetime(2020,1,1)
-fin    = datetime(2020,6,30)
-
-datosF = pd.DataFrame({'Fechas' : datos.FechaRegistro})
-
-ceros = np.arange((fin - inicio).days + 1 - datosF.nunique(0).Fechas)*0
-
-f = np.array(datosF.Fechas.value_counts())
-
-frecuencias = np.concatenate((f,ceros))
-
-n = len(frecuencias)
-m = np.mean(frecuencias)
-v = (n - 1)/n * np.var(frecuencias, ddof=1)
-size = (m**2/(v - m))*365
-p = size/(size+m)
-
+print('Valor p genpareto ' + str(stats.kstest(np.exp(logeados2), "genpareto", args=(parametros_pareto2))[1]))
+print('Valor p gamma ' + str(stats.kstest(np.exp(logeados2), "gamma", args=(parametros_gamma2))[1]))
+print('Valor p dweibull ' + str(stats.kstest(np.exp(logeados2), "dweibull", args=(parametros_weibull2))[1]))
+print('Valor p gennorm ' + str(stats.kstest(np.exp(logeados2), "gennorm", args=(parametros_gennorm))[1]))
 
 
 #%% Conteo de reclamos por día
@@ -398,11 +328,20 @@ for i in range(0,len(rango_fechas)):
 df = pd.DataFrame({'Fecha': rango_fechas, 'Conteo': conteo_dias })
 
 
-plt.hist(data=df, x="Conteo", bins = len(conteo_dias));
-plt.title("Histograma para el número de reclamos por día")
-plt.xlabel('Número de reclamos')
-plt.ylabel("Conteo")
 
+## Gráfico de conteo por días 
+fig = plt.figure()
+
+plt.hist(data=df, x="Conteo", bins = len(conteo_dias));
+plt.title("Conteo número de reclamos por día para los meses de enero-junio 2020")  
+          
+plt.xlabel('Número de reclamos por día')
+
+plt.ylabel('Conteo')
+
+plt.savefig('Frecuencia.eps', format='eps', dpi=1300)
+
+plt.show()
 
 
 
@@ -410,14 +349,14 @@ plt.ylabel("Conteo")
 
 #%%
 
-## Parámetros obtenidos para la poisson
+## Parámetros  para el ajuste de la distribución poisson
 lamb = np.mean(conteo_dias)
 
 q =  np.linspace(0.01,0.99,182)
 cuantil_teorico = stats.poisson.ppf(q, mu = lamb)
 cuantil_observado = np.quantile(conteo_dias, q)
 
-
+## Gráfico de revisión de ajustes para la distribución poisson
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
 ax1.scatter(cuantil_teorico, cuantil_observado, color = "blue")
@@ -462,14 +401,15 @@ fig.suptitle("Ajuste Poisson", fontsize=14)
 fig.tight_layout(pad=0.9)
 fig.subplots_adjust(top=0.85)
 
-plt.savefig('Frecuencias_poisson.jpeg', format='jpeg', dpi=1300)
+plt.savefig('Frecuencias_poisson.eps', format='eps', dpi=1300)
 
 plt.show()
 
 
 #%%
 
-## Parámetros obtenidos en R para la geometrica
+## Parámetros para ajuste de la distribución geométrica
+
 p = 1/(1 + np.mean(conteo_dias))
 
 
@@ -477,7 +417,7 @@ q =  np.linspace(0.01,0.99,182)
 cuantil_teorico = stats.geom.ppf(q , p)
 cuantil_observado = np.quantile(conteo_dias, q)
 
-
+## Gráfico de revisión de ajustes para la distribución geométrica
 
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
@@ -522,16 +462,27 @@ fig.suptitle("Ajuste geométrica", fontsize=14)
 fig.tight_layout(pad=0.9)
 fig.subplots_adjust(top=0.85)
 
-plt.savefig('Frecuencias_geometrica.jpeg', format='jpeg', dpi=1300)
 
 plt.show()
 
 
 #%%
 
-## Parámetros obtenidos en R para la binomial negativa
-mu = 4.129051
-size = 0.174687
+## Parámetros de ajuste para la distribución binomial negativa obtenidos en R
+## usando MLE
+
+
+# Importando paquetes de R para cálculo de parámetros binomial negativa
+fitdistrplus = importr('fitdistrplus')
+MASS = importr('MASS')
+Stats = importr('stats')
+
+# Cálculo de parámetros binomial negativa en R
+ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(conteo_dias),
+                                     "nbinom", "mle")
+
+mu = ajuste_nbinom[0][1]
+size = ajuste_nbinom[0][0]
 prob = size/(size + mu)
 
 q =  np.linspace(0.01,0.99,182)
@@ -539,6 +490,7 @@ cuantil_teorico = stats.nbinom.ppf(q, n = size, p = prob)
 cuantil_observado = np.quantile(conteo_dias, q)
 
 
+## Gráfico de revisión de ajustes para la distribución binomial negativa
 
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(nrows = 2, ncols = 2)
 
@@ -585,42 +537,31 @@ fig.suptitle("Ajuste binomial negativa", fontsize=14)
 fig.tight_layout(pad=0.9)
 fig.subplots_adjust(top=0.85)
 
-plt.savefig('Frecuencias_nbinom.jpeg', format='jpeg', dpi=1300)
-
 plt.show()
 
 
 #%%
 
-logeados2 = logeados[ logeados >= np.quantile(logeados, 0.95)]
-datos_sampleo = datos.MontoHistorico[datos.MontoHistorico >= np.quantile(datos.MontoHistorico, 0.95)]
-f2 = Fitter(datos_sampleo,  distributions= 'genpareto')
-f2.fit()
-parametros_pareto2 =  f2.fitted_param['genpareto']
-
-
-#%%
-
-#### Algoritmo para las simulaciones todo en escala logarítmica
+#### Algoritmo para las simulaciones modelo con teoría valoe extremo
 
 # m: numero de simulaciones
 m = 10000
     # Umbral para teoría del valor extremo
 q = 0.95
-# parámetros binomial negativa
+# nivel alfa para el VaR y ES
+alfa = 0.99
 
-mu = 4.129051
-size = 0.174687
-prob = size/(size + mu)
-#size = 0.2730495
+# Se multiplica el parámetro de size de la binomial negativa por 365 para el cálculo de un año
 size = size*365
 
+# Se guardan en un vector los parámetros de la distribución binomial negativa
 parametros_nbinom = np.array([size,prob])
 
 # Función para sampleo de la distribución empírica
 
 def sampleo_distr_empirica(n):
     ''' 
+    Esta función realiza un sampleo de la distribución empírica
     n = tamaño del sampleo
     '''
     uniformes = np.random.uniform(size = n)
@@ -630,7 +571,7 @@ def sampleo_distr_empirica(n):
     
 
 # vector de totales
-totales = np.zeros(m) 
+totales_valor_extremo = np.zeros(m) 
 
 # Simulaciones
 # Se fija la semilla para obtener replicar los resultados 
@@ -641,10 +582,7 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
                                p = parametros_nbinom[1],
                                loc = 0, size = m)
 
-#maximos = np.zeros(m) 
-#no_empiricas = np.zeros(m) 
-li_recla = list()
-
+# Simulaciones
 for j in range(0,m):
     # Genere vector de variables U_N_j,1 , ... , U_N_j,N_j
     Uniformes = np.random.uniform(size = Frecuencias[j])
@@ -661,74 +599,47 @@ for j in range(0,m):
                         loc = parametros_pareto2[1], scale = parametros_pareto2[2],
                         size = sum(Uniformes > q))
     
-    li_recla.append(Reclamaciones)
-    #maximos[j] = max(Reclamaciones)
-    #no_empiricas[j] = sum(Uniformes > q)
     
     # Se guardan la suma de las reclamaciones
     # Elimina el efecto de los logarítmos
-    totales[j] = sum(Reclamaciones)
+    totales_valor_extremo[j] = sum(Reclamaciones)
 
-#%%
+#%% Resultados obtenidos modelo con teoría valor extremo
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
 #Media
-locale.format_string("%d", np.mean(totales) , grouping=True)
+print("Promedio de las simulaciones modelo teoría valor extremo: " +  locale.format_string("%d", np.mean(totales_valor_extremo) , grouping=True))
 
-# Var 99
-Var = np.quantile(totales, q = 0.99)
-locale.format_string("%d", Var , grouping=True)
+# Var alfa
+Var = np.quantile(totales_valor_extremo,  alfa)
+print("VaR " + str(alfa)+  " de las simulaciones modelo teoría valor extremo: "  + locale.format_string("%d", Var , grouping=True))
 
-# ES 99
-ES =  np.mean(totales[totales > Var])
-locale.format_string("%d",ES, grouping=True)
+# ES alfa
+ES =  np.mean(totales_valor_extremo[totales_valor_extremo > Var])
+print("ES " + str(alfa)+  " de las simulaciones modelo teoría valor extremo: " + locale.format_string("%d",ES, grouping=True))
 
 
 #%%
 
-# Gráfico histograma de totales
-plt.hist(np.log(totales))
-plt.title("Histograma de los totales simulados")
-plt.xlabel('Logaritmo de los totales')
-plt.ylabel('Conteo') 
-
-
-plt.savefig('hist_de los totales simulados.jpeg', format='jpeg', dpi=1300)
-
-plt.show()
-
-#%%
-
-
+#Ajuste de la distribución normal generalizada a los montos con trasnformación logarítmica
 
 parametros_lognormal = stats.gennorm.fit(logeados)
 
-
-sm.qqplot(logeados, stats.gennorm, 
-          distargs= (parametros_lognormal[0],) , 
-          loc = parametros_lognormal[1], 
-          scale = parametros_lognormal[2],
-          line = "45")
-
-
 #%%
+
+#### Algoritmo para las simulaciones modelo con ajuste log normal
+
 
 # m: numero de simulaciones
 m = 10000
 # parámetros binomial negativa
 
-mu = 4.129051
-size = 0.174687
-prob = size/(size + mu)
-#size = 0.2730495
-size = size*365
-
 parametros_nbinom = np.array([size,prob])
 
 
 # vector de totales
-totales = np.zeros(m) 
+totales_log_normal = np.zeros(m) 
 
 # Simulaciones
 # Se fija la semilla para obtener replicar los resultados 
@@ -739,9 +650,6 @@ Frecuencias = stats.nbinom.rvs(n = parametros_nbinom[0] ,
                                p = parametros_nbinom[1],
                                loc = 0, size = m)
 
-#maximos = np.zeros(m) 
-#no_empiricas = np.zeros(m) 
-li_recla = list()
 
 for j in range(0,m):
     # Vector de reclamaciones
@@ -750,125 +658,30 @@ for j in range(0,m):
                         loc = parametros_lognormal[1], 
                         scale = parametros_lognormal[2],
                         size = Frecuencias[j] )
-    #maximos[j] = max(Reclamaciones)
-    #no_empiricas[j] = sum(Uniformes > q)
-    li_recla.append(Reclamaciones)
+ 
     # Se guardan la suma de las reclamaciones
     # Elimina el efecto de los logarítmos
-    totales[j] = sum(np.exp(Reclamaciones))
+    totales_log_normal[j] = sum(np.exp(Reclamaciones))
 
 
 
 
+#%% Resultados obtenidos modelo con ajuste log-normal
+
+locale.setlocale(locale.LC_ALL, 'en_US')
+
+#Media
+print("Promedio de las simulaciones modelo ajuste log-normal: " +  locale.format_string("%d", np.mean(totales_log_normal) , grouping=True))
+
+# Var alfa
+Var = np.quantile(totales_log_normal, alfa)
+print("VaR " + str(alfa)+  " de las simulaciones modelo ajuste log-normal: "  + locale.format_string("%d", Var , grouping=True))
+
+# ES alfa
+ES =  np.mean(totales_log_normal[totales_log_normal > Var])
+print("ES " + str(alfa)+  " de las simulaciones modelo ajuste log-normal: " + locale.format_string("%d",ES, grouping=True))
 
 
 
 
-
-
-
-#%%
-# #from rpy2.robjects.packages import importr
-# # import R's "base" package
-
-# import rpy2.robjects.packages as rpackages
-
-# # import R's utility package
-# utils = rpackages.importr('utils')
-
-# # select a mirror for R packages
-# utils.chooseCRANmirror(ind=1)
-
-# packnames = ('fitdistrplus', 'MASS')
-
-# # R vector of strings
-# from rpy2.robjects.vectors import StrVector
-
-# # Selectively install what needs to be install.
-# # We are fancy, just because we can.
-# names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
-# if len(names_to_install) > 0:
-#     utils.install_packages(StrVector(names_to_install))
-
-
-
-#%%
-# import rpy2.robjects as robjects
-# from rpy2.robjects.packages import importr
-# # import R's "base" package
-# fitdistrplus = importr('fitdistrplus')
-# MASS = importr('MASS')
-# Stats = importr('stats')
-
-# ajuste_nbinom = fitdistrplus.fitdist(robjects.IntVector(conteo_dias),
-#                                      "nbinom", "mle")
-
-
-
-
-
-#%%
-
-# q =  np.linspace(0.01,0.99,182)
-# cuantil_observado = np.quantile(np.exp(logeados), q)
-# ecdf = sm.distributions.ECDF(cuantil_observado)
-
-# for j in range(0, len(li_recla)):
-#     cuantil_observado2 = np.quantile(li_recla[j] ,q)
-#     ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
-
-#     plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
-#          color = "red")
-
-
-# plt.plot(cuantil_observado, ecdf(cuantil_observado),
-#          color = "blue", label = "CDF observado")
-
-# plt.title("Distribución acumulada", fontsize=11)
-# plt.xlabel('Datos', fontsize=8)
-# plt.ylabel("CDF", fontsize=8)
-# plt.legend()
-
-# plt.show()
-
-
-#%%
-
-# q =  np.linspace(0.01,0.99,182)
-# cuantil_observado = np.quantile(logeados, q)
-# ecdf = sm.distributions.ECDF(cuantil_observado)
-
-
-# for j in range(0, len(li_recla)):
-#     cuantil_observado2 = np.quantile(li_recla[j] ,q)
-#     ecdf_simulado = sm.distributions.ECDF(cuantil_observado2)
-
-#     plt.plot(cuantil_observado, ecdf_simulado(cuantil_observado),
-#          color = "red")
-
-
-# plt.plot(cuantil_observado, ecdf(cuantil_observado),
-#          color = "blue", label = "CDF observado")
-
-# plt.title("Distribución acumulada", fontsize=11)
-# plt.xlabel('Datos', fontsize=8)
-# plt.ylabel("CDF", fontsize=8)
-# plt.legend()
-
-# plt.show()
-
-
-
- #%% Pruebas KS
-
-stats.kstest(logeados, "genpareto", args=(parametros_pareto))
-stats.kstest(logeados, "gennorm", args=(parametros_normal))
-stats.kstest(logeados, "gamma", args=(parametros_gamma))
-stats.kstest(logeados, "dweibull", args=(parametros_weibull))
-
-    
-stats.kstest(logeados2, "genpareto", args=(parametros_pareto2))
-stats.kstest(logeados2, "gennorm", args=(parametros_normal2))
-stats.kstest(logeados2, "gamma", args=(parametros_gamma2))
-stats.kstest(logeados2, "dweibull", args=(parametros_weibull2))
 
